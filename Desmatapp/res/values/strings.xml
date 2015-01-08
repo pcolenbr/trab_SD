@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Desmatapp</string>
+    <string name="action_settings">Configurações</string>
+    <string name="plant">Plantador</string>
+    <string name="lenh">Lenhador</string>
+    <string name="cerc">Cerca</string>
+    <string name="arv">Plantar</string>
+    <string name="reg">Regar</string>
+    <string name="cort">Cortar</string>
+    <string name="dest">Destruir</string>
+    <string name="sair">Sair</string>
+    <string name="esp">Esperando outro(s) jogador(es)</string>
+    <string name="fim">Final de jogo</string>
+    <string name="venceu">Você venceu!</string>
+    <string name="perdeu">Você perdeu…</string>
+    <string name="tempo">Tempo</string>
+    <string name="up">Para cima</string>
+    <string name="down">Para baixo</string>
+    <string name="left">Para esquerda</string>
+    <string name="right">Para direita</string>
+    <string name="title_activity_game">Desmatapp</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+</resources>
