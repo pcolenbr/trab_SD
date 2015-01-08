@@ -116,6 +116,7 @@ public class GameActivity extends Activity {
 					int ivID = getResources().getIdentifier(name,
 						    "id", getPackageName());
 					tabuleiro[i][j] = (ImageView) findViewById(ivID);
+					tabuleiro[i][j].setTag(R.drawable.empty);
 					
 				}
 			}
@@ -187,41 +188,48 @@ public class GameActivity extends Activity {
 			pos_futura[1] = j;
 			//Tratar fronteiras
 			if(i>4){
-				pos_futura[0] = 0;
-			}
-			if(j>4){
-				pos_futura[1] = 0;
-			}
-			if(i<0){
 				pos_futura[0] = 4;
 			}
-			if(j<0){
+			if(j>4){
 				pos_futura[1] = 4;
 			}
+			if(i<0){
+				pos_futura[0] = 0;
+			}
+			if(j<0){
+				pos_futura[1] = 0;
+			}
+			int ImgPosFutura = (Integer) tabuleiro[pos_atual[0]][pos_atual[1]].getTag();
 			switch (acao) {
 			case CERCA:
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.fence);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.fence);
 				acao = 0;
 				break;
 			case CORTAR:
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);	
 				acao = 0;	
 				break;
 			case DESTRUIR:
 				//TODO colocar um tempo
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
 				acao = 0;				
 				break;
 			case PLANTAR:
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			case REGAR:
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			default:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
+				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(ImgPosFutura);
+				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(ImgPosFutura);
 				acao = 0;
 				break;
 			}
