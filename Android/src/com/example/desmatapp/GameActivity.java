@@ -1,5 +1,7 @@
 package com.example.desmatapp;
 
+import com.example.desmatapp.util.Globals;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -45,6 +47,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					//TODO Avisar ao servidor que o jogador saiu
+					Globals.cliente.FecharConexao();
 					finish();
 				}
 			});			
@@ -116,7 +119,6 @@ public class GameActivity extends Activity {
 					int ivID = getResources().getIdentifier(name,
 						    "id", getPackageName());
 					tabuleiro[i][j] = (ImageView) findViewById(ivID);
-					tabuleiro[i][j].setTag(R.drawable.empty);
 					
 				}
 			}
@@ -188,48 +190,41 @@ public class GameActivity extends Activity {
 			pos_futura[1] = j;
 			//Tratar fronteiras
 			if(i>4){
-				pos_futura[0] = 4;
-			}
-			if(j>4){
-				pos_futura[1] = 4;
-			}
-			if(i<0){
 				pos_futura[0] = 0;
 			}
-			if(j<0){
+			if(j>4){
 				pos_futura[1] = 0;
 			}
-			int ImgPosFutura = (Integer) tabuleiro[pos_atual[0]][pos_atual[1]].getTag();
+			if(i<0){
+				pos_futura[0] = 4;
+			}
+			if(j<0){
+				pos_futura[1] = 4;
+			}
 			switch (acao) {
 			case CERCA:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.fence);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.fence);
 				acao = 0;
 				break;
 			case CORTAR:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);	
 				acao = 0;	
 				break;
 			case DESTRUIR:
 				//TODO colocar um tempo
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
 				acao = 0;				
 				break;
 			case PLANTAR:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			case REGAR:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
 				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			default:
-				tabuleiro[pos_atual[0]][pos_atual[1]].setTag(ImgPosFutura);
-				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(ImgPosFutura);
+				tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
 				acao = 0;
 				break;
 			}

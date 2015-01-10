@@ -1,5 +1,8 @@
 package com.example.desmatapp;
 
+import com.example.desmatapp.util.ClienteTCP;
+import com.example.desmatapp.util.Globals;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +18,15 @@ public class MainActivity extends Activity {
 	// Tipos de jogadores
 	private static final int PLANTADOR = 0;
 	private static final int LENHADOR = 1;
+	private static String ip_servidor;
+	private static int porta_servidor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ip_servidor = "192.168.56.101";
+        porta_servidor = 3333;
         SetComponents();
     }
 
@@ -36,6 +43,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Iniciar o jogo como plantador
+				Globals.cliente = new ClienteTCP(MainActivity.this, ip_servidor, porta_servidor,PLANTADOR);
+				new Thread(Globals.cliente).start();
 				Intent intent = new Intent(MainActivity.this, GameActivity.class);
 				intent.putExtra("tipo_jogador", PLANTADOR);
 				startActivity(intent);
@@ -54,6 +63,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Iniciar o jogo como lenhador
+				Globals.cliente = new ClienteTCP(MainActivity.this, ip_servidor, porta_servidor,LENHADOR);
+				new Thread(Globals.cliente).start();
 				Intent intent = new Intent(MainActivity.this, GameActivity.class);
 				intent.putExtra("tipo_jogador", LENHADOR);
 				startActivity(intent);
