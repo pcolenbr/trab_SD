@@ -41,6 +41,7 @@ public class ClienteTCP implements Runnable{
 						Toast.makeText(context, "Conectado com o servidor.", Toast.LENGTH_SHORT).show();
 					}
 				});
+				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
 				//os.writeBytes("sair");
 				os.writeBytes(tipo+"\n");
