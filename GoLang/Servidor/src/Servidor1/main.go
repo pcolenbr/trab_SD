@@ -110,8 +110,8 @@ func NovoTabuleiro() *Tabuleiro{
 func InserirJogador(tipo string, conexao net.Conn ){
 	rand.Seed(time.Now().Unix())
 	
-	pos_coluna := ""
-	pos_linha := ""
+	pos_coluna := strconv.Itoa(rand.Intn(4 - 0) + 0)
+	pos_linha := strconv.Itoa(rand.Intn(4 - 0) + 0)
 	
 	for {
 		
@@ -228,7 +228,8 @@ func handleRequest(conn net.Conn) {
   			posAtual := cmd[2]
   			posDesejada := cmd[3]
 
-			fmt.Println("Mover jogador")  			
+			fmt.Println("Mover jogador")  	
+			
   			MoverJogador(id, posAtual, posDesejada)
 
   			
