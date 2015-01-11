@@ -56,16 +56,30 @@ type ListaJogadores struct{
 
 type Objeto struct{
 	id int
-	tipo string
+	tipo_obj string
+	tipo_jog string
 	pos_linha string
 	pos_coluna string
 	//tempo de tempo do posicionamento?	
 	}
 
+func NovoObjetoVazio(ident int, p1 string, p2 string) *Objeto{
+	objeto:= &Objeto{
+		id: ident,
+		tipo_obj: VAZIO,
+		tipo_jog: VAZIO,
+		pos_linha: p1,
+		pos_coluna: p2,
+	}
+	
+	return objeto
+}
+
 func NovoObjeto(ident int, p1 string, p2 string) *Objeto{
 	objeto:= &Objeto{
 		id: ident,
-		tipo: VAZIO,
+		tipo_obj: ARVORE,
+		tipo_jog: VAZIO,
 		pos_linha: p1,
 		pos_coluna: p2,
 	}
@@ -93,7 +107,11 @@ func NovoTabuleiro() *Tabuleiro{
 	for i:=0; i<5; i++{
 		for j:=0; j<5; j++{
 			cont++
-			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjeto(cont,strconv.Itoa(i),strconv.Itoa(j))
+			/*if i==0 && j==0{
+				tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjeto(cont,strconv.Itoa(i),strconv.Itoa(j))
+			}else{*/
+				tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio(cont,strconv.Itoa(i),strconv.Itoa(j))
+			//}
 		}
 	}
 	return tabuleiro
@@ -101,6 +119,7 @@ func NovoTabuleiro() *Tabuleiro{
 
 
 func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.Conn ){
+	//posicao_vazia := false
 	fmt.Println("Preparando insercao na linha "+pos_linha+" e coluna "+pos_coluna)
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
@@ -112,33 +131,42 @@ func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.C
 		fmt.Println(_tabuleiro.objetos[pos_linha+","+pos_coluna])
 		if (_tabuleiro.objetos[pos_linha+","+pos_coluna] != nil){
 			fmt.Println("Encontrou o objeto")
-			if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,PLANTADOR) || 
-				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,LENHADOR){
-					linha,err := strconv.Atoi(pos_linha)
-					if err != nil {
-			            fmt.Println("Erro convertendo a linha: ", err.Error())
-			        }
-					coluna,err := strconv.Atoi(pos_coluna)
-					if err != nil {
-			            fmt.Println("Erro convertendo a coluna: ", err.Error())
-			        }
-					if(coluna == 4){
-						if(linha >= 0 && linha <4){
-							linha = linha+1
-						}else{
-							linha = linha-1	
-						}
+			//for (!posicao_vazia){
+				if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_obj,VAZIO) &&
+				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog,VAZIO){
+						fmt.Println("Posicao no tabuleiro esta vazia")
+						_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = PLANTADOR
+						fmt.Println("Plantador inserido na linha "+pos_linha+" e coluna "+pos_coluna)
+						//posicao_vazia = true
+						
 					}else{
-						coluna = coluna+1
+						fmt.Println("Posicao no tabuleiro nao esta vazia")
+						linha,err := strconv.Atoi(pos_linha)
+						if err != nil {
+				            fmt.Println("Erro convertendo a linha: ", err.Error())
+				        }
+						coluna,err := strconv.Atoi(pos_coluna)
+						if err != nil {
+				            fmt.Println("Erro convertendo a coluna: ", err.Error())
+				        	}
+						
+						if(coluna == 4){
+							if(linha >= 0 && linha <4){
+								linha = linha+1
+								coluna = 0
+							}else{
+								coluna = 0	
+							}
+						}else{
+							coluna = coluna+1
+						}
+						if !(strings.EqualFold(pos_linha, strconv.Itoa(linha)) || strings.EqualFold(pos_coluna, strconv.Itoa(coluna))){					
+							fmt.Println("Tentando em outra posicao")
+							pos_linha = strconv.Itoa(linha)
+							pos_coluna = strconv.Itoa(coluna)	
+						}
 					}
-					pos_linha = strconv.Itoa(linha)
-					pos_coluna = strconv.Itoa(coluna)
-					InserirJogador(tipo,pos_linha,pos_coluna,conexao)
-				}else{
-					fmt.Println("Posicao no tabuleiro esta vazia")
-					_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo = PLANTADOR
-					fmt.Println("Plantador inserido na linha "+pos_linha+" e coluna "+pos_coluna)
-				}
+				//}
 		}
 	}
 	
