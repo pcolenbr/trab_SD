@@ -45,6 +45,7 @@ public class ClienteTCP implements Runnable{
 				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
+				
 				os.flush();
 				final byte[] data = new byte[6556];
 				try {

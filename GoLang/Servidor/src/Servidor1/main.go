@@ -228,7 +228,8 @@ func handleRequest(conn net.Conn) {
   			posAtual := cmd[2]
   			posDesejada := cmd[3]
 
-			fmt.Println("Mover jogador")  			
+			fmt.Println("Mover jogador")  	
+			
   			MoverJogador(id, posAtual, posDesejada)
 
   			
