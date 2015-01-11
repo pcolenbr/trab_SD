@@ -33,13 +33,13 @@ var (
 	_msg string
 )
 
-type Jogador struct{
+type Jogador struct {
 	id int
 	tipo string
 	pos_linha string
 	pos_coluna string
 	conexao net.Conn
-	}
+}
 
 func NovoJogador(ident int, tip string, p1 string, p2 string, conn net.Conn) *Jogador{
 	jogador:= &Jogador{
@@ -53,8 +53,8 @@ func NovoJogador(ident int, tip string, p1 string, p2 string, conn net.Conn) *Jo
 }
 
 type ListaJogadores struct{
-	jogadores []*Jogador
-	}
+	jogadores map[int]*Jogador
+}
 
 type Objeto struct{
 	id int
@@ -77,43 +77,30 @@ func NovoObjetoVazio(ident int, p1 string, p2 string) *Objeto{
 	return objeto
 }
 
-func NovoObjeto(ident int, p1 string, p2 string) *Objeto{
-	objeto:= &Objeto{
-		id: ident,
-		tipo_obj: ARVORE,
-		tipo_jog: VAZIO,
-		pos_linha: p1,
-		pos_coluna: p2,
-	}
-	
-	return objeto
-}
 type Tabuleiro struct{
 	objetos map[string]*Objeto
 }
 
 // Cria uma lista de jogadores
 func NovaListaJogadores() *ListaJogadores{
+	
 	listajogadores := &ListaJogadores{
-		jogadores: make([]*Jogador,0),
-		}
+		jogadores: make(map[int]*Jogador),
+	}
+	
 	return listajogadores
 }
 
 // Cria o tabuleiro com objetos vazios
 func NovoTabuleiro() *Tabuleiro{
-	tabuleiro := &Tabuleiro{
+	tabuleiro := &Tabuleiro {
 		objetos: make(map[string]*Objeto),
 	}
-	cont:=0
-	for i:=0; i<5; i++{
+	cont := 0
+	for i := 0; i < 5; i++ {
 		for j:=0; j<5; j++{
 			cont++
-			/*if i==0 && j==0{
-				tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjeto(cont,strconv.Itoa(i),strconv.Itoa(j))
-			}else{*/
-				tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio(cont,strconv.Itoa(i),strconv.Itoa(j))
-			//}
+			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio(cont,strconv.Itoa(i),strconv.Itoa(j))
 		}
 	}
 	return tabuleiro
@@ -128,13 +115,13 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	
 	for {
 		
-		pos_coluna := strconv.Itoa(rand.Intn(4 - 0) + 0)
-		pos_linha := strconv.Itoa(rand.Intn(4 - 0) + 0)
-		
-		if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_obj,VAZIO) &&
-				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog,VAZIO) {
+		if strings.EqualFold(_tabuleiro.objetos[pos_linha + "," + pos_coluna].tipo_obj,VAZIO) &&
+				strings.EqualFold(_tabuleiro.objetos[pos_linha + "," + pos_coluna].tipo_jog,VAZIO) {
 			break;
 		}
+				
+		pos_coluna = strconv.Itoa(rand.Intn(4 - 0) + 0)
+		pos_linha = strconv.Itoa(rand.Intn(4 - 0) + 0)
 		
 	}
 	
@@ -143,9 +130,27 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
-	_listadejogadores.jogadores = append(_listadejogadores.jogadores,jogador)
+	_listadejogadores.jogadores[id] = jogador
 	fmt.Println("Inseriu o jogador")
 	
+}
+
+func MoverJogador(id string, posAtual string, posDesejada string) string {
+	
+	ident, err := strconv.Atoi(id)
+	if err != nil {
+        fmt.Println("Erro:", err.Error())
+        return posAtual
+    }
+	
+	if strings.EqualFold(_tabuleiro.objetos[posDesejada].tipo_jog,VAZIO) {
+		_tabuleiro.objetos[posAtual].tipo_jog = VAZIO
+		_tabuleiro.objetos[posDesejada].tipo_jog = _listadejogadores.jogadores[ident].tipo
+		
+		return posDesejada
+	}
+	
+	return posAtual
 }
 
 
@@ -217,7 +222,17 @@ func handleRequest(conn net.Conn) {
    			
    			conn.Write([]byte("Message received."))
    			
-  		} else if (strings.EqualFold(cmd[0], string("sair"))) {
+  		} else if (strings.EqualFold(cmd[0], string("mover"))) {
+  			
+  			id := cmd[1]
+  			posAtual := cmd[2]
+  			posDesejada := cmd[3]
+
+			fmt.Println("Mover jogador")  			
+  			MoverJogador(id, posAtual, posDesejada)
+
+  			
+		} else if (strings.EqualFold(cmd[0], string("sair"))) {
   			
   			fecharConexao(conn)
   			
