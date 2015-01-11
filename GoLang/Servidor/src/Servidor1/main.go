@@ -106,6 +106,13 @@ func NovoTabuleiro() *Tabuleiro{
 	return tabuleiro
 }
 
+func ImprimirTabuleiro(){
+	for i := 0; i < 5; i++ {
+		for j:=0; j<5; j++{
+			fmt.Println(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)])
+		}
+	}
+}
 
 func InserirJogador(tipo string, conexao net.Conn ){
 	rand.Seed(time.Now().Unix())
@@ -131,7 +138,9 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
 	_listadejogadores.jogadores[id] = jogador
+	_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
+	ImprimirTabuleiro()
 	
 }
 

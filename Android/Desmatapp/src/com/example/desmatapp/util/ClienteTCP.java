@@ -52,13 +52,8 @@ public class ClienteTCP implements Runnable{
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);
 					if(size>0){
-						((Activity) context).runOnUiThread(new Runnable() {
-							
-							@Override
-							public void run() {
-								Toast.makeText(context, "Mensagem do servidor: "+ data.toString(), Toast.LENGTH_SHORT).show();
-							}
-						});
+						//final String s = new String(data);
+						
 						
 					}
 				} catch (Exception e) {
@@ -72,6 +67,28 @@ public class ClienteTCP implements Runnable{
 			Log.e("ERROR", e.toString());
 		}
 		
+	}
+	
+	public String MoverJogador(int id, String pos_atual, String pos_desejada){
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.writeBytes("moverJogador:" + id +":"+ pos_atual+":"+pos_desejada+"\n");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		final byte[] data = new byte[6556];
+		try {
+			InputStream is = sock.getInputStream();
+			int size = is.read(data);
+			if(size>0){
+				return new String(data);			
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return pos_atual;
 	}
 	
 	public void FecharConexao(){
