@@ -7,6 +7,7 @@ import (
     "log"
     "bufio"
 	"strings"
+	"strconv"
 	//"bytes"
 	//"encoding/binary"
 )
@@ -92,7 +93,7 @@ func NovoTabuleiro() *Tabuleiro{
 	for i:=0; i<5; i++{
 		for j:=0; j<5; j++{
 			cont++
-			tabuleiro.objetos[string(i)+","+string(j)] = NovoObjeto(cont,string(i),string(j))
+			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjeto(cont,strconv.Itoa(i),strconv.Itoa(j))
 		}
 	}
 	return tabuleiro
@@ -103,11 +104,38 @@ func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.C
 	fmt.Println("Preparando insercao na linha "+pos_linha+" e coluna "+pos_coluna)
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
+	fmt.Println("Criou o jogador")
 	_listadejogadores.jogadores = append(_listadejogadores.jogadores,jogador)
+	fmt.Println("Inseriu o jogador")
 	if strings.EqualFold(tipo,PLANTADOR){
+		fmt.Println("Tipo Plantador")
+		fmt.Println(_tabuleiro.objetos[pos_linha+","+pos_coluna])
 		if (_tabuleiro.objetos[pos_linha+","+pos_coluna] != nil){
+			fmt.Println("Encontrou o objeto")
 			if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,PLANTADOR) || 
 				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,LENHADOR){
+					linha,err := strconv.Atoi(pos_linha)
+					if err != nil {
+			            fmt.Println("Erro convertendo a linha: ", err.Error())
+			        }
+					coluna,err := strconv.Atoi(pos_coluna)
+					if err != nil {
+			            fmt.Println("Erro convertendo a coluna: ", err.Error())
+			        }
+					if(coluna == 5){
+						if(linha >= 0 && linha <5){
+							linha = linha+1
+						}else{
+							linha = linha-1	
+						}
+					}else{
+						coluna = coluna+1
+					}
+					pos_linha = strconv.Itoa(linha)
+					pos_coluna = strconv.Itoa(coluna)
+					InserirJogador(tipo,pos_linha,pos_coluna,conexao)
+				}else{
+					fmt.Println("Posicao no tabuleiro esta vazia")
 					_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo = PLANTADOR
 					fmt.Println("Plantador inserido na linha "+pos_linha+" e coluna "+pos_coluna)
 				}
@@ -171,13 +199,17 @@ func handleRequest(conn net.Conn) {
     fmt.Println("Error reading buf:", err.Error())
   }
   if reqLen>0{
-  	mensagem := string(buf[:])
-  	fmt.Println(mensagem)
-	fmt.Println(string(PLANTADOR))
-  	if strings.EqualFold(mensagem,string(PLANTADOR)){
+  	mensagem := string(buf[0:1])
+  	if (strings.EqualFold(mensagem,string(PLANTADOR))){
   		fmt.Println("Inserir jogador")
-   		InserirJogador(PLANTADOR,"0","0",conn)
-  	
+   		InserirJogador(PLANTADOR,strconv.Itoa(0),strconv.Itoa(0),conn)
+   		fmt.Print(_tabuleiro.objetos["0,0"])
+  	}else{
+  		if(strings.EqualFold(mensagem,string(LENHADOR))){
+	  		fmt.Println("Inserir jogador")
+	   		InserirJogador(LENHADOR,strconv.Itoa(4),strconv.Itoa(4),conn)
+	   		fmt.Print(_tabuleiro.objetos["4,4"])
+	  	} 
   	}
     }
   reader := bufio.NewReader(conn)
