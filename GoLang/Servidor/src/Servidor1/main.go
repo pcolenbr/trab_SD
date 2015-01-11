@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    CONN_HOST = "192.168.0.140"
+    CONN_HOST = "192.168.56.101"
     CONN_PORT = "3333"
     CONN_TYPE = "tcp"
     VAZIO 	  = "0"
@@ -110,8 +110,8 @@ func NovoTabuleiro() *Tabuleiro{
 func InserirJogador(tipo string, conexao net.Conn ){
 	rand.Seed(time.Now().Unix())
 	
-	pos_coluna := ""
-	pos_linha := ""
+	pos_coluna := strconv.Itoa(rand.Intn(4 - 0) + 0)
+	pos_linha := strconv.Itoa(rand.Intn(4 - 0) + 0)
 	
 	for {
 		

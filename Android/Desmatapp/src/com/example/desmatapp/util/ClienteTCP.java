@@ -2,6 +2,7 @@ package com.example.desmatapp.util;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -43,9 +44,26 @@ public class ClienteTCP implements Runnable{
 				});
 				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-				//os.writeBytes("sair");
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				os.flush();
+				final byte[] data = new byte[6556];
+				try {
+					InputStream is = sock.getInputStream();
+					int size = is.read(data);
+					if(size>0){
+						((Activity) context).runOnUiThread(new Runnable() {
+							
+							@Override
+							public void run() {
+								Toast.makeText(context, "Mensagem do servidor: "+ data.toString(), Toast.LENGTH_SHORT).show();
+							}
+						});
+						
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 			}
 		} catch (UnknownHostException e) {
 			Log.e("ERROR", e.toString());
