@@ -44,7 +44,7 @@ public class ClienteTCP implements Runnable{
 				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
 				//os.writeBytes("sair");
-				os.writeBytes(tipo+"\n");
+				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				os.flush();
 			}
 		} catch (UnknownHostException e) {

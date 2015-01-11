@@ -8,6 +8,8 @@ import (
     "bufio"
 	"strings"
 	"strconv"
+	"math/rand"
+    "time"
 	//"bytes"
 	//"encoding/binary"
 )
@@ -118,57 +120,31 @@ func NovoTabuleiro() *Tabuleiro{
 }
 
 
-func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.Conn ){
-	//posicao_vazia := false
-	fmt.Println("Preparando insercao na linha "+pos_linha+" e coluna "+pos_coluna)
+func InserirJogador(tipo string, conexao net.Conn ){
+	rand.Seed(time.Now().Unix())
+	
+	pos_coluna := ""
+	pos_linha := ""
+	
+	for {
+		
+		pos_coluna := strconv.Itoa(rand.Intn(4 - 0) + 0)
+		pos_linha := strconv.Itoa(rand.Intn(4 - 0) + 0)
+		
+		if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_obj,VAZIO) &&
+				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog,VAZIO) {
+			break;
+		}
+		
+	}
+	
+	fmt.Println("X: " + pos_coluna)
+	fmt.Println("Y: " + pos_linha)	
+	
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
-	fmt.Println("Criou o jogador")
 	_listadejogadores.jogadores = append(_listadejogadores.jogadores,jogador)
 	fmt.Println("Inseriu o jogador")
-	if strings.EqualFold(tipo,PLANTADOR){
-		fmt.Println("Tipo Plantador")
-		fmt.Println(_tabuleiro.objetos[pos_linha+","+pos_coluna])
-		if (_tabuleiro.objetos[pos_linha+","+pos_coluna] != nil){
-			fmt.Println("Encontrou o objeto")
-			//for (!posicao_vazia){
-				if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_obj,VAZIO) &&
-				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog,VAZIO){
-						fmt.Println("Posicao no tabuleiro esta vazia")
-						_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = PLANTADOR
-						fmt.Println("Plantador inserido na linha "+pos_linha+" e coluna "+pos_coluna)
-						//posicao_vazia = true
-						
-					}else{
-						fmt.Println("Posicao no tabuleiro nao esta vazia")
-						linha,err := strconv.Atoi(pos_linha)
-						if err != nil {
-				            fmt.Println("Erro convertendo a linha: ", err.Error())
-				        }
-						coluna,err := strconv.Atoi(pos_coluna)
-						if err != nil {
-				            fmt.Println("Erro convertendo a coluna: ", err.Error())
-				        	}
-						
-						if(coluna == 4){
-							if(linha >= 0 && linha <4){
-								linha = linha+1
-								coluna = 0
-							}else{
-								coluna = 0	
-							}
-						}else{
-							coluna = coluna+1
-						}
-						if !(strings.EqualFold(pos_linha, strconv.Itoa(linha)) || strings.EqualFold(pos_coluna, strconv.Itoa(coluna))){					
-							fmt.Println("Tentando em outra posicao")
-							pos_linha = strconv.Itoa(linha)
-							pos_coluna = strconv.Itoa(coluna)	
-						}
-					}
-				//}
-		}
-	}
 	
 }
 
@@ -216,39 +192,48 @@ func fecharConexao(conn net.Conn){
 // Handles incoming requests.
 func handleRequest(conn net.Conn) {
   // Make a buffer to hold incoming data.
-  buf := make([]byte, 1024)
+  	buf := make([]byte, 1024)
   // Read the incoming connection into the buffer.
   
   
   // Send a response back to person contacting us.
-  conn.Write([]byte("Message received."))
-  reqLen, err := conn.Read(buf)
-  if err != nil {
-    fmt.Println("Error reading buf:", err.Error())
-  }
-  if reqLen>0{
-  	mensagem := string(buf[0:1])
-  	if (strings.EqualFold(mensagem,string(PLANTADOR))){
-  		fmt.Println("Inserir jogador")
-   		InserirJogador(PLANTADOR,strconv.Itoa(0),strconv.Itoa(0),conn)
-   		fmt.Print(_tabuleiro.objetos["0,0"])
-  	}else{
-  		if(strings.EqualFold(mensagem,string(LENHADOR))){
-	  		fmt.Println("Inserir jogador")
-	   		InserirJogador(LENHADOR,strconv.Itoa(4),strconv.Itoa(4),conn)
-	   		fmt.Print(_tabuleiro.objetos["4,4"])
-	  	} 
+  	reqLen, err := conn.Read(buf)
+  	if err != nil {
+    	fmt.Println("Error reading buf:", err.Error())
   	}
+  	
+  	if reqLen > 0 {
+  		mensagem := string(buf[0:256])
+  		cmd := strings.Split(mensagem, ":")
+  		
+  		fmt.Println(cmd[0])
+  		
+  		if (strings.EqualFold(cmd[0], string("iniciarJogador"))) {
+  			
+  			tipo := cmd[1]
+  			fmt.Println("Inserir jogador")
+   			InserirJogador(tipo, conn)
+   			fmt.Print(_tabuleiro.objetos["0,0"])
+   			
+   			conn.Write([]byte("Message received."))
+   			
+  		} else if (strings.EqualFold(cmd[0], string("sair"))) {
+  			
+  			fecharConexao(conn)
+  			
+  		}
+  		
     }
-  reader := bufio.NewReader(conn)
-  msg, err := reader.ReadString(' ')
-  if err != nil {
-  }
   
-  // Close the connection when you're done with it.
-  if strings.EqualFold(msg,"sair"){
-  	fecharConexao(conn)
-  	}else{
-  	msg = ""
+  	reader := bufio.NewReader(conn)
+  	msg, err := reader.ReadString(' ')
+  	if err != nil {
+  	}
+  
+  	// Close the connection when you're done with it.
+  	if strings.EqualFold(msg,"sair"){
+  		fecharConexao(conn)
+  	} else {
+  		msg = ""
   	}
 }
