@@ -160,8 +160,6 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	linhaDesejada := strings.Split(posDesejada, ",")
 	colunaDesejada := strings.Split(posDesejada, ",")
 	
-	fmt.Println(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]])
-	
 	
 	if strings.EqualFold(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog, VAZIO) {
 		_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog = VAZIO
