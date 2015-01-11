@@ -122,8 +122,8 @@ func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.C
 					if err != nil {
 			            fmt.Println("Erro convertendo a coluna: ", err.Error())
 			        }
-					if(coluna == 5){
-						if(linha >= 0 && linha <5){
+					if(coluna == 4){
+						if(linha >= 0 && linha <4){
 							linha = linha+1
 						}else{
 							linha = linha-1	
