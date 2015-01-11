@@ -84,7 +84,7 @@ public class ClienteTCP implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		final byte[] data = new byte[6556];
+		final byte[] data = new byte[2048];
 		try {
 			InputStream is = sock.getInputStream();
 			int size = is.read(data);
