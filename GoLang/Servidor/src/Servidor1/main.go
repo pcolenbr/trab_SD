@@ -135,8 +135,8 @@ func InserirJogador(tipo string, conexao net.Conn ){
 		
 	}
 	
-	fmt.Println("X: " + pos_coluna)
-	fmt.Println("Y: " + pos_linha)	
+	fmt.Println("X: " + pos_linha)
+	fmt.Println("Y: " + pos_coluna)	
 	
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
@@ -160,7 +160,10 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	linhaDesejada := strings.Split(posDesejada, ",")
 	colunaDesejada := strings.Split(posDesejada, ",")
 	
-	if strings.EqualFold(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog,VAZIO) {
+	fmt.Println(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]])
+	
+	
+	if strings.EqualFold(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog, VAZIO) {
 		_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog = VAZIO
 		_tabuleiro.objetos[linhaDesejada[0] + "," + colunaDesejada[0]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		
