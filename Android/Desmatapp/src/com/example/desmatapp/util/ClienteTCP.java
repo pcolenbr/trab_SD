@@ -44,7 +44,7 @@ public class ClienteTCP implements Runnable{
 				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
 				//os.writeBytes("sair");
-				os.writeBytes("iniciarJogador:" + tipo+"\n");
+				os.writeBytes("mover:0:2,2:3,2");
 				
 				os.flush();
 			}

@@ -103,9 +103,19 @@ func NovoTabuleiro() *Tabuleiro{
 			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio(cont,strconv.Itoa(i),strconv.Itoa(j))
 		}
 	}
+	
 	return tabuleiro
 }
 
+func ImprimirTabuleiro() {
+	
+	for i := 0; i < 5; i++ {
+		for j:=0; j<5; j++{
+			fmt.Println(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)])
+		}
+	}
+	
+}
 
 func InserirJogador(tipo string, conexao net.Conn ){
 	rand.Seed(time.Now().Unix())
@@ -131,6 +141,7 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
 	_listadejogadores.jogadores[id] = jogador
+	_tabuleiro.objetos[pos_linha + "," + pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
 	
 }
@@ -143,16 +154,21 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
         return posAtual
     }
 	
-	if strings.EqualFold(_tabuleiro.objetos[posDesejada].tipo_jog,VAZIO) {
-		_tabuleiro.objetos[posAtual].tipo_jog = VAZIO
-		_tabuleiro.objetos[posDesejada].tipo_jog = _listadejogadores.jogadores[ident].tipo
+	linhaAtual := strings.Split(posAtual, ",")
+	colunaAtual := strings.Split(posAtual, ",")
+	
+	linhaDesejada := strings.Split(posDesejada, ",")
+	colunaDesejada := strings.Split(posDesejada, ",")
+	
+	if strings.EqualFold(_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog,VAZIO) {
+		_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog = VAZIO
+		_tabuleiro.objetos[linhaDesejada[0] + "," + colunaDesejada[0]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		
 		return posDesejada
 	}
 	
 	return posAtual
 }
-
 
 
 func main() {
@@ -228,9 +244,15 @@ func handleRequest(conn net.Conn) {
   			posAtual := cmd[2]
   			posDesejada := cmd[3]
 
+			InserirJogador("1", conn)
+			
+			ImprimirTabuleiro()
+			
 			fmt.Println("Mover jogador")  	
 			
   			MoverJogador(id, posAtual, posDesejada)
+  			
+  			ImprimirTabuleiro()
 
   			
 		} else if (strings.EqualFold(cmd[0], string("sair"))) {
