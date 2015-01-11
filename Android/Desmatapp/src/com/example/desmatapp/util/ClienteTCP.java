@@ -18,6 +18,7 @@ public class ClienteTCP implements Runnable{
 	private Context context;
 	private Socket sock;
 	private int tipo;
+	public int id;
 
 	public ClienteTCP(Context context, String ip, int porta, int tipo) {
 
@@ -52,12 +53,17 @@ public class ClienteTCP implements Runnable{
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);
 					if(size>0){
-						//final String s = new String(data);
+						final String s = new String(data);
+						String[] res = s.split(":");
+						if (res[0].equals("id")){
+							this.id = Integer.parseInt(res[1]); 
+						}
 						
 						
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
+					e.printStackTrace();
 				}
 				
 			}
@@ -87,6 +93,7 @@ public class ClienteTCP implements Runnable{
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 		}
 		return pos_atual;
 	}

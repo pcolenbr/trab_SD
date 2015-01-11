@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    CONN_HOST = "192.168.0.140"
+    CONN_HOST = "192.168.56.101"
     CONN_PORT = "3333"
     CONN_TYPE = "tcp"
     VAZIO 	  = "0"
@@ -143,7 +143,7 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	_listadejogadores.jogadores[id] = jogador
 	_tabuleiro.objetos[pos_linha + "," + pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
-	
+	conexao.Write([]byte("id:"+strconv.Itoa(id)))	
 }
 
 func MoverJogador(id string, posAtual string, posDesejada string) string {
@@ -234,7 +234,6 @@ func handleRequest(conn net.Conn) {
   			tipo := cmd[1]
   			fmt.Println("Inserir jogador")
    			InserirJogador(tipo, conn)
-   			fmt.Print(_tabuleiro.objetos["0,0"])
    			
    			conn.Write([]byte("Message received."))
    			

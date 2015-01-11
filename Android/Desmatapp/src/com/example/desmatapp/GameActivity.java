@@ -142,8 +142,7 @@ public class GameActivity extends Activity {
 			ib_up.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(/*TODO colocar o id recebido do servidor*/0, pos_atual[0]+","+pos_atual[1], pos_atual[0]-1+","+pos_atual[1])).split(",");
-					
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], (pos_atual[0]-1)+","+pos_atual[1])).split(",");					
 					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
@@ -151,21 +150,24 @@ public class GameActivity extends Activity {
 			ib_right.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					set_posicao(pos_atual[0],pos_atual[1]+1);
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], pos_atual[0]+","+(pos_atual[1]+1))).split(",");					
+					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
 			ib_down = (ImageButton) findViewById(R.id.ib_down);
 			ib_down.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					set_posicao(pos_atual[0]+1,pos_atual[1]);
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], (pos_atual[0]+1)+","+pos_atual[1])).split(",");
+					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
 			ib_left = (ImageButton) findViewById(R.id.ib_left);
 			ib_left.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					set_posicao(pos_atual[0],pos_atual[1]-1);
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], pos_atual[0]+","+(pos_atual[1]-1))).split(",");					
+					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
 			
