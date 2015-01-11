@@ -17,8 +17,8 @@ public class GameActivity extends Activity {
 		private int[] pos_atual;
 		private int tipo,acao;
 		// Tipos de jogadores
-		private static final int PLANTADOR = 0;
-		private static final int LENHADOR = 1;
+		private static final int PLANTADOR = 1;
+		private static final int LENHADOR = 2;
 		// Tipos de ações
 		private static final int PLANTAR = 10;
 		private static final int CERCA = 20;

@@ -16,8 +16,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	private Button bt_plant, bt_lenh, bt_sair;
 	// Tipos de jogadores
-	private static final int PLANTADOR = 0;
-	private static final int LENHADOR = 1;
+	private static final int PLANTADOR = 1;
+	private static final int LENHADOR = 2;
 	private static String ip_servidor;
 	private static int porta_servidor;
 

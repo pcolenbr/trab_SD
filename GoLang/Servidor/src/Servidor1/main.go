@@ -7,18 +7,20 @@ import (
     "log"
     "bufio"
 	"strings"
+	//"bytes"
+	//"encoding/binary"
 )
 
 const (
     CONN_HOST = "192.168.56.101"
     CONN_PORT = "3333"
     CONN_TYPE = "tcp"
-    VAZIO 	  = 0
-    ARVORE 	  = 10
-    ARVORE_M  = 20
-    CERCA	  = 30
-    PLANTADOR = 1
-    LENHADOR  = 2
+    VAZIO 	  = "0"
+    ARVORE 	  = "10"
+    CERCA	  = "20"
+    ARVORE_M  = "30"
+    PLANTADOR = "1"
+    LENHADOR  = "2"
     MAXJOGADORES = 3
 )
 
@@ -30,13 +32,13 @@ var (
 
 type Jogador struct{
 	id int
-	tipo int
-	pos_linha int
-	pos_coluna int
+	tipo string
+	pos_linha string
+	pos_coluna string
 	conexao net.Conn
 	}
 
-func NovoJogador(ident int, tip int, p1 int, p2 int, conn net.Conn) *Jogador{
+func NovoJogador(ident int, tip string, p1 string, p2 string, conn net.Conn) *Jogador{
 	jogador:= &Jogador{
 		id: ident,
 		tipo: tip,
@@ -53,13 +55,13 @@ type ListaJogadores struct{
 
 type Objeto struct{
 	id int
-	tipo int
-	pos_linha int
-	pos_coluna int
+	tipo string
+	pos_linha string
+	pos_coluna string
 	//tempo de tempo do posicionamento?	
 	}
 
-func NovoObjeto(ident int, p1 int, p2 int) *Objeto{
+func NovoObjeto(ident int, p1 string, p2 string) *Objeto{
 	objeto:= &Objeto{
 		id: ident,
 		tipo: VAZIO,
@@ -70,7 +72,7 @@ func NovoObjeto(ident int, p1 int, p2 int) *Objeto{
 	return objeto
 }
 type Tabuleiro struct{
-	objetos map[int]*Objeto
+	objetos map[string]*Objeto
 }
 
 // Cria uma lista de jogadores
@@ -84,17 +86,37 @@ func NovaListaJogadores() *ListaJogadores{
 // Cria o tabuleiro com objetos vazios
 func NovoTabuleiro() *Tabuleiro{
 	tabuleiro := &Tabuleiro{
-		objetos: make(map[int]*Objeto),
+		objetos: make(map[string]*Objeto),
 	}
 	cont:=0
 	for i:=0; i<5; i++{
 		for j:=0; j<5; j++{
 			cont++
-			tabuleiro.objetos[cont] = NovoObjeto(cont,i,j)
+			tabuleiro.objetos[string(i)+","+string(j)] = NovoObjeto(cont,string(i),string(j))
 		}
 	}
 	return tabuleiro
 }
+
+
+func InserirJogador(tipo string,pos_linha string,pos_coluna string,conexao net.Conn ){
+	fmt.Println("Preparando insercao na linha "+pos_linha+" e coluna "+pos_coluna)
+	id := len(_listadejogadores.jogadores) + 1
+	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
+	_listadejogadores.jogadores = append(_listadejogadores.jogadores,jogador)
+	if strings.EqualFold(tipo,PLANTADOR){
+		if (_tabuleiro.objetos[pos_linha+","+pos_coluna] != nil){
+			if strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,PLANTADOR) || 
+				strings.EqualFold(_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo,LENHADOR){
+					_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo = PLANTADOR
+					fmt.Println("Plantador inserido na linha "+pos_linha+" e coluna "+pos_coluna)
+				}
+		}
+	}
+	
+}
+
+
 
 func main() {
 	fmt.Println("Criando o tabuleiro")
@@ -149,13 +171,20 @@ func handleRequest(conn net.Conn) {
     fmt.Println("Error reading buf:", err.Error())
   }
   if reqLen>0{
-    fmt.Println(string(buf))
+  	mensagem := string(buf[:])
+  	fmt.Println(mensagem)
+	fmt.Println(string(PLANTADOR))
+  	if strings.EqualFold(mensagem,string(PLANTADOR)){
+  		fmt.Println("Inserir jogador")
+   		InserirJogador(PLANTADOR,"0","0",conn)
+  	
+  	}
     }
-  
   reader := bufio.NewReader(conn)
   msg, err := reader.ReadString(' ')
   if err != nil {
   }
+  
   // Close the connection when you're done with it.
   if strings.EqualFold(msg,"sair"){
   	fecharConexao(conn)
