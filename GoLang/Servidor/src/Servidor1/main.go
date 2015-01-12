@@ -15,7 +15,7 @@ import (
 )
 
 const (
-    CONN_HOST = "192.168.56.101"
+    CONN_HOST = "192.168.0.140"
     CONN_PORT = "3333"
     CONN_TYPE = "tcp"
     VAZIO 	  = "0"
@@ -117,7 +117,34 @@ func ImprimirTabuleiro() {
 	
 }
 
-func InserirJogador(tipo string, conexao net.Conn ){
+func RetornarTabuleiro() string{
+	
+	retorno := "{'objetos' : [\n"
+	
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 5; j++{
+			retorno += "{\n"
+			
+			retorno += "'id' : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ", \n"
+			retorno += "'tipoObj' : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ", \n"
+			retorno += "'tipoJog' : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog + ", \n"
+			retorno += "'posicao' : " + strconv.Itoa(i)+","+strconv.Itoa(j) + "\n"
+			
+			if(i == 4 && j == 4) {
+				retorno += "}\n"
+			} else {
+				retorno += "},\n"
+			}
+		}
+	}
+	
+	retorno += "]}"
+	
+	return retorno
+	
+}
+
+func InserirJogador(tipo string, conexao net.Conn ) string {
 	rand.Seed(time.Now().Unix())
 	
 	pos_coluna := strconv.Itoa(rand.Intn(4 - 0) + 0)
@@ -143,7 +170,9 @@ func InserirJogador(tipo string, conexao net.Conn ){
 	_listadejogadores.jogadores[id] = jogador
 	_tabuleiro.objetos[pos_linha + "," + pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
-	conexao.Write([]byte("id:"+strconv.Itoa(id)))	
+	
+	return "'id':"+strconv.Itoa(id)
+	
 }
 
 func MoverJogador(id string, posAtual string, posDesejada string) string {
@@ -165,10 +194,40 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 		_tabuleiro.objetos[linhaAtual[0] + "," + colunaAtual[0]].tipo_jog = VAZIO
 		_tabuleiro.objetos[linhaDesejada[0] + "," + colunaDesejada[0]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		
-		return posDesejada
+		return "'posicao':" + posDesejada
 	}
 	
-	return posAtual
+	return "'posicao':" + posAtual
+	
+}
+
+func Plantar(id string, pos string) string {
+	
+	linha := strings.Split(pos, ",")
+	coluna := strings.Split(pos, ",")
+	
+	if strings.EqualFold(_tabuleiro.objetos[linha[0] + "," + coluna[0]].tipo_obj, VAZIO) {
+		_tabuleiro.objetos[linha[0] + "," + coluna[0]].tipo_obj = ARVORE
+		
+		return "'plantar' : true"
+	}
+	
+	return "'plantar' : false"
+	
+}
+
+func Cortar(id string, pos string) string {
+	
+	linha := strings.Split(pos, ",")
+	coluna := strings.Split(pos, ",")
+	
+	if strings.EqualFold(_tabuleiro.objetos[linha[0] + "," + coluna[0]].tipo_obj, ARVORE) {
+		_tabuleiro.objetos[linha[0] + "," + coluna[0]].tipo_obj = VAZIO
+		
+		return "'cortar' : true"
+	}
+	
+	return "'cortar' : false"
 }
 
 
@@ -234,9 +293,11 @@ func handleRequest(conn net.Conn) {
   			
   			tipo := cmd[1]
   			fmt.Println("Inserir jogador")
-   			InserirJogador(tipo, conn)
+   			id := InserirJogador(tipo, conn)
+   			tab := RetornarTabuleiro()
    			
-   			conn.Write([]byte("Message received."))
+   			conn.Write([]byte(id + ";" + tab))	
+   			
    			
   		} else if (strings.EqualFold(cmd[0], string("mover"))) {
   			
@@ -244,17 +305,32 @@ func handleRequest(conn net.Conn) {
   			posAtual := cmd[2]
   			posDesejada := cmd[3]
 
-			InserirJogador("1", conn)
-			
-			ImprimirTabuleiro()
-			
 			fmt.Println("Mover jogador")  	
-			
-  			MoverJogador(id, posAtual, posDesejada)
-  			
-  			ImprimirTabuleiro()
+  			pos := MoverJogador(id, posAtual, posDesejada)
+  			tab := RetornarTabuleiro()
 
+			conn.Write([]byte(pos + ";" + tab))
   			
+		} else if (strings.EqualFold(cmd[0], string("plantar"))) {
+			
+			id := cmd[1]
+  			pos := cmd[2]
+  			
+  			plantar := Plantar(id, pos)
+  			tab := RetornarTabuleiro()
+  			
+  			conn.Write([]byte(plantar + ";" + tab))
+			
+		} else if (strings.EqualFold(cmd[0], string("cortar"))) {
+			
+			id := cmd[1]
+  			pos := cmd[2]
+  			
+  			cortar := Cortar(id, pos)
+  			tab := RetornarTabuleiro()
+  			
+  			conn.Write([]byte(cortar + ";" + tab))
+			
 		} else if (strings.EqualFold(cmd[0], string("sair"))) {
   			
   			fecharConexao(conn)
