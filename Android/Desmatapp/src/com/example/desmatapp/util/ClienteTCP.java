@@ -50,7 +50,7 @@ public class ClienteTCP implements Runnable{
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				
 				os.flush();
-				final byte[] data = new byte[64];
+				final byte[] data = new byte[2048];
 				try {
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);

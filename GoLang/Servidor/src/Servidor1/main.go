@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"bytes"
 	//"encoding/binary"
 )
 
@@ -123,7 +122,7 @@ func RetornarTabuleiro() string {
 
 						retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
 						retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
-						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog + ","
+						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog
 						
 
 			if i == 4 && j == 4 {
@@ -282,7 +281,7 @@ func handleRequest(conn net.Conn) {
 	}
 
 	if reqLen > 0 {
-		mensagem := string(buf[0:256])
+		mensagem := string(buf[0:reqLen-1])
 		cmd := strings.Split(mensagem, ":")
 
 		fmt.Println(cmd[0])
@@ -290,18 +289,14 @@ func handleRequest(conn net.Conn) {
 		if strings.EqualFold(cmd[0], string("iniciarJogador")) {
 
 			tipo := cmd[1]
+			
 			fmt.Println("Inserir jogador")
 			id := InserirJogador(tipo, conn)
 			tab := RetornarTabuleiro()
 			
 			b := []byte(id + ";" +tab)
-			b2 := bytes.Trim([]byte(tab),"\000")
-			
-			fmt.Println(tab)
-			fmt.Println(b)
-			fmt.Println(b2)
 
-			//conn.Write(b)
+			conn.Write(b)
 
 		} else if strings.EqualFold(cmd[0], string("mover")) {
 
@@ -314,7 +309,6 @@ func handleRequest(conn net.Conn) {
 			tab := RetornarTabuleiro()
 
 			b :=[]byte(pos + ";" + tab)
-			b = bytes.Trim(b, "\x00")
 
 			conn.Write(b)
 
@@ -326,7 +320,6 @@ func handleRequest(conn net.Conn) {
 			plantar := Plantar(id, pos)
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
-			b = bytes.Trim(b, "\x00")
 
 			conn.Write(b)
 
