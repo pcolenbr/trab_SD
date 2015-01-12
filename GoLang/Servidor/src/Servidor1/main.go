@@ -124,7 +124,7 @@ func RetornarTabuleiro() string {
 						retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
 						retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
 						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog + ","
-						retorno += "\"posicao\" : \"" + strconv.Itoa(i)+","+strconv.Itoa(j)+"\""
+						
 
 			if i == 4 && j == 4 {
 				retorno += "}"
@@ -290,15 +290,13 @@ func handleRequest(conn net.Conn) {
 			tab := RetornarTabuleiro()
 			
 			b := []byte(id + ";" +tab)
-			b1 := []byte(id)
 			b2 := []byte(tab)
 			
 			fmt.Println(tab)
 			fmt.Println(b)
-			fmt.Println(b1)
 			fmt.Println(b2)
 
-			conn.Write(b)
+			//conn.Write(b)
 
 		} else if strings.EqualFold(cmd[0], string("mover")) {
 
