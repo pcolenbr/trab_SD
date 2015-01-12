@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "192.168.0.140"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -291,6 +291,7 @@ func handleRequest(conn net.Conn) {
 
 			tipo := cmd[1]
 			fmt.Println("Inserir jogador")
+			fmt.Println("Inserir jogador" + tipo)
 			id := InserirJogador(tipo, conn)
 			tab := RetornarTabuleiro()
 			
