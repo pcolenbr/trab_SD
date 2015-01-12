@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "192.168.0.140"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -60,18 +60,14 @@ type Objeto struct {
 	id         int
 	tipo_obj   string
 	tipo_jog   string
-	pos_linha  string
-	pos_coluna string
 	//tempo de tempo do posicionamento?
 }
 
-func NovoObjetoVazio(ident int, p1 string, p2 string) *Objeto {
+func NovoObjetoVazio() *Objeto {
 	objeto := &Objeto{
-		id:         ident,
+		id:         0,
 		tipo_obj:   VAZIO,
 		tipo_jog:   VAZIO,
-		pos_linha:  p1,
-		pos_coluna: p2,
 	}
 
 	return objeto
@@ -100,7 +96,7 @@ func NovoTabuleiro() *Tabuleiro {
 	for i := 0; i < 5; i++ {
 		for j := 0; j < 5; j++ {
 			cont++
-			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio(cont, strconv.Itoa(i), strconv.Itoa(j))
+			tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)] = NovoObjetoVazio()
 		}
 	}
 
@@ -294,8 +290,13 @@ func handleRequest(conn net.Conn) {
 			tab := RetornarTabuleiro()
 			
 			b := []byte(id + ";" +tab)
+			b1 := []byte(id)
+			b2 := []byte(tab)
 			
-			b = bytes.Trim(b, "\x00")
+			fmt.Println(tab)
+			fmt.Println(b)
+			fmt.Println(b1)
+			fmt.Println(b2)
 
 			conn.Write(b)
 
