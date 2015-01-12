@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -48,16 +50,30 @@ public class ClienteTCP implements Runnable{
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				
 				os.flush();
-				final byte[] data = new byte[6556];
+				final byte[] data = new byte[2048];
 				try {
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);
 					if(size>0){
 						final String s = new String(data);
-						String[] res = s.split(":");
-						if (res[0].equals("id")){
-							this.id = Integer.parseInt(res[1]); 
+						String[] res = s.split(";");
+						try {
+							for (int i = 0; i< res.length; i++){
+								JSONObject job = new JSONObject(res[i]);
+								if (job.has("id")){
+									job.get("id");
+									
+								}
+								
+								
+							}
+						} catch (Throwable t) {
+							t.printStackTrace();
 						}
+//						if (res[0].con("id")){
+//							this.id = Integer.parseInt(res[1]); 
+//						}
+//						if (res[1])
 						
 						
 					}
