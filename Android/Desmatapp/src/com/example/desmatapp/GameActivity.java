@@ -1,5 +1,8 @@
 package com.example.desmatapp;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import com.example.desmatapp.util.Globals;
 
 import android.app.Activity;
@@ -257,45 +260,101 @@ public class GameActivity extends Activity {
 		
 		public void redesenharTabuleiro(int acao, int tipo, int x, int y){
 			switch (acao) {
-			case CERCA:
-				Globals.cliente.tabuleiro[x][y].setTag(R.drawable.fence);
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.fence);
-				acao = 0;
-				break;
-			case CORTAR:
-				Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);	
-				acao = 0;	
-				break;
-			case DESTRUIR:
-				//TODO colocar um tempo
-				Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);
-				acao = 0;				
-				break;
-			case PLANTAR:
-				Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
-				acao = 0;				
-				break;
-			case REGAR:
-				Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
-				acao = 0;				
-				break;
-			default:
-				acao = 0;
-				break;
+				case CERCA:
+					Globals.cliente.tabuleiro[x][y].setTag(R.drawable.fence);
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.fence);
+					acao = 0;
+					break;
+				case CORTAR:
+					Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);	
+					acao = 0;	
+					break;
+				case DESTRUIR:
+					//TODO colocar um tempo
+					Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);
+					acao = 0;				
+					break;
+				case PLANTAR:
+					Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
+					acao = 0;				
+					break;
+				case REGAR:
+					Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
+					acao = 0;				
+					break;
+				default:
+					acao = 0;
+					break;
 			}
 			switch (tipo) {
-			case PLANTADOR:
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);				
-				break;
-			case LENHADOR:
-				Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);				
-				break;
-			default:
-				break;
+				case PLANTADOR:
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);				
+					break;
+				case LENHADOR:
+					Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);				
+					break;
+				default:
+					break;
 			}
+		}
+		
+		public void desenharTabuleiro(JSONArray dados) throws JSONException {
+			int count = 0;
+			
+			int obj = -1;
+			int jog = -1;
+		
+			for (int x = 0; x < 5; x++) {
+				for (int y = 0; y < 5; y++) { 
+					
+					obj = dados.getJSONObject(count).getInt("tipoObj");
+					jog = dados.getJSONObject(count).getInt("tipoJog");
+					
+					switch (obj) {
+						case CERCA:
+							Globals.cliente.tabuleiro[x][y].setTag(R.drawable.fence);
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.fence);
+							break;
+						case CORTAR:
+							Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);	
+							break;
+						case DESTRUIR:
+							//TODO colocar um tempo
+							Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);
+							break;
+						case PLANTAR:
+							Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
+							break;
+						case REGAR:
+							Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
+							break;
+						default:
+							break;
+					}
+					
+					switch (jog) {
+						case PLANTADOR:
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);				
+							break;
+						case LENHADOR:
+							Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);				
+							break;
+						default:
+							break;
+					}
+					
+					count++;
+					
+				}
+			}				
+			
 		}
 }

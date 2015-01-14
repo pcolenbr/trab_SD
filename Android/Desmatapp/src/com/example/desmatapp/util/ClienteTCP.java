@@ -17,7 +17,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class ClienteTCP implements Runnable{
+public class ClienteTCP implements Runnable {
 	private String ip;
 	private int porta;
 	//private EventListener listener;
@@ -69,30 +69,17 @@ public class ClienteTCP implements Runnable{
 					if(size>0){
 						final String s = new String(data);
 						String[] res = s.split(";");
-						try {
-							for (int i = 0; i< res.length; i++){
-								JSONObject job = new JSONObject(res[i]);
-								if (job.has("id")){
-									this.id = (Integer) job.get("id");									
-								}
-								if(job.has("objetos")){
-									int cont = 0;
-									JSONArray ja = job.getJSONArray("objetos");
-									for(int j=0; j<5;j++){
-										for(int y=0; y<5;y++){ 
-											GameActivity ga = (GameActivity) ((Activity)context);
-											ga.redesenharTabuleiro(ja.getJSONObject(cont).getInt("tipoObj"), 
-																	ja.getJSONObject(cont).getInt("tipoJog"),
-																	j, y);
-											
-										}
-									}
-								}
-								
-								
-							}
-						} catch (Throwable t) {
-							t.printStackTrace();
+						
+						for (int i = 0; i< res.length; i++){
+							JSONObject job = new JSONObject(res[i]);
+							
+							if (job.has("id")){
+								this.id = (Integer) job.get("id");									
+							} else if(job.has("objetos")){
+								JSONArray ja = job.getJSONArray("objetos");
+								GameActivity ga = (GameActivity) ((Activity)context);
+								ga.desenharTabuleiro(ja);
+							}							
 						}
 //						if (res[0].con("id")){
 //							this.id = Integer.parseInt(res[1]); 

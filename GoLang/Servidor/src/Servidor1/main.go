@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.219"
+	CONN_HOST    = "172.16.253.254"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -142,8 +142,8 @@ func RetornarTabuleiro() string {
 func InserirJogador(tipo string, conexao net.Conn) string {
 	rand.Seed(time.Now().Unix())
 
-	pos_coluna := strconv.Itoa(0)
-	pos_linha := strconv.Itoa(0)
+	pos_coluna := strconv.Itoa(rand.Intn(4-0) + 0)
+	pos_linha := strconv.Itoa(rand.Intn(4-0) + 0)
 
 	for {
 
@@ -152,8 +152,8 @@ func InserirJogador(tipo string, conexao net.Conn) string {
 			break
 		}
 
-		pos_coluna = strconv.Itoa(0)
-		pos_linha = strconv.Itoa(0)
+		pos_coluna = strconv.Itoa(rand.Intn(4-0) + 0)
+		pos_linha = strconv.Itoa(rand.Intn(4-0) + 0)
 
 	}
 
@@ -291,7 +291,6 @@ func handleRequest(conn net.Conn) {
 			tipo := cmd[1]
 			
 			fmt.Println("Inserir jogador")
-			fmt.Println("Inserir jogador" + tipo)
 			id := InserirJogador(tipo, conn)
 			tab := RetornarTabuleiro()
 			
