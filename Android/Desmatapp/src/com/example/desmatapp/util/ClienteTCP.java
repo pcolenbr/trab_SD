@@ -24,6 +24,7 @@ public class ClienteTCP implements Runnable {
 	private Context context;
 	private Socket sock;
 	private int tipo;
+	public int[] pos_atual;
 	public int id;
 	public ImageView[][] tabuleiro;
 
@@ -34,6 +35,7 @@ public class ClienteTCP implements Runnable {
 		this.sock = null;
 		this.tipo = tipo;
 		this.tabuleiro = new ImageView[5][5];
+		this.pos_atual = new int[2];
 	}
 	
 	public void setContext(Context context){
@@ -76,7 +78,13 @@ public class ClienteTCP implements Runnable {
 							
 							if (job.has("id")){
 								this.id = (Integer) job.get("id");									
-							} else if(job.has("objetos")){
+							}else if(job.has("pos")){
+								String st = (String) job.get("pos");
+								String[] pos = st.split(",");
+								pos_atual[0] = Integer.parseInt(pos[0]);
+								pos_atual[1] = Integer.parseInt(pos[1]);							
+							} 
+							else if(job.has("objetos")){
 								JSONArray ja = job.getJSONArray("objetos");
 								((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 							}							

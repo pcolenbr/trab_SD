@@ -177,7 +177,7 @@ func InserirJogador(tipo string, conexao net.Conn) string {
 	_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
 
-	return "{id:" + strconv.Itoa(id) + "}"
+	return "{id:" + strconv.Itoa(id) + "}; {pos:" + pos_linha + "," + pos_coluna + "}"
 
 }
 

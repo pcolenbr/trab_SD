@@ -17,7 +17,7 @@ public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
 		
 		private ImageButton ib_up, ib_right, ib_down, ib_left;
-		private int[] pos_atual;
+		//private int[] Globals.cliente.pos_atual;
 		private int tipo,acao;
 		// Tipos de jogadores
 		private static final int PLANTADOR = 1;
@@ -129,16 +129,16 @@ public class GameActivity extends Activity {
 			//--------- Fim Globals.cliente.tabuleiro ----------//
 			
 			//--------- Início movimentações ----------//
-			//pos_atual = get_posicao();
+			//Globals.cliente.pos_atual = get_posicao();
 			/*switch (tipo) {
 			case PLANTADOR:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.plant);				
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.plant);				
 				break;
 			case LENHADOR:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.lenh);				
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.lenh);				
 				break;
 			default:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);
 				break;
 			}*/
 			ib_up = (ImageButton) findViewById(R.id.ib_up);
@@ -153,7 +153,7 @@ public class GameActivity extends Activity {
 			ib_right.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], pos_atual[0]+","+(pos_atual[1]+1))).split(",");					
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1))).split(",");					
 					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
@@ -161,7 +161,7 @@ public class GameActivity extends Activity {
 			ib_down.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], (pos_atual[0]+1)+","+pos_atual[1])).split(",");
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1])).split(",");
 					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
@@ -169,7 +169,7 @@ public class GameActivity extends Activity {
 			ib_left.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, pos_atual[0]+","+pos_atual[1], pos_atual[0]+","+(pos_atual[1]-1))).split(",");					
+					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1))).split(",");					
 					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
 				}
 			});
@@ -183,7 +183,7 @@ public class GameActivity extends Activity {
 		/*private int[] get_posicao() {
 			// TODO Inserir código para enviar requisição ao servidor
 			//Código abaixo somente para testes
-			return pos_atual;
+			return Globals.cliente.pos_atual;
 		}*/
 
 		private void set_posicao(int i, int j) {
@@ -205,37 +205,37 @@ public class GameActivity extends Activity {
 			if(j<0){
 				pos_futura[1] = 0;
 			}
-			int ImgPosFutura = (Integer) Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].getTag();
+			int ImgPosFutura = (Integer) Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].getTag();
 			switch (acao) {
 			case CERCA:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.fence);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.fence);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.fence);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.fence);
 				acao = 0;
 				break;
 			case CORTAR:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);	
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.empty);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);	
 				acao = 0;	
 				break;
 			case DESTRUIR:
 				//TODO colocar um tempo
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.empty);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.empty);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);
 				acao = 0;				
 				break;
 			case PLANTAR:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.tree);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			case REGAR:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(R.drawable.tree);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.tree);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.tree);
 				acao = 0;				
 				break;
 			default:
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setTag(ImgPosFutura);
-				Globals.cliente.tabuleiro[pos_atual[0]][pos_atual[1]].setImageResource(ImgPosFutura);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(ImgPosFutura);
+				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(ImgPosFutura);
 				acao = 0;
 				break;
 			}
@@ -250,11 +250,10 @@ public class GameActivity extends Activity {
 				Globals.cliente.tabuleiro[pos_futura[0]][pos_futura[1]].setImageResource(R.drawable.empty);
 				break;
 			}
-			pos_atual = pos_futura;			
+			Globals.cliente.pos_atual = pos_futura;			
 		}
 		
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
-		pos_atual = new int[2];
 			runOnUiThread(new Runnable() {
 				
 				@Override
