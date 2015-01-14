@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.219"
+	CONN_HOST    = "172.16.253.254"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -177,7 +177,7 @@ func InserirJogador(tipo string, conexao net.Conn) string {
 	_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
 
-	return "{id:" + strconv.Itoa(id) + "}; {pos:" + pos_linha + "," + pos_coluna + "}"
+	return "{id:" + strconv.Itoa(id) + "}; {posicao: '" + pos_linha + "," + pos_coluna + "'}"
 
 }
 

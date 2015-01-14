@@ -78,8 +78,8 @@ public class ClienteTCP implements Runnable {
 							
 							if (job.has("id")){
 								this.id = (Integer) job.get("id");									
-							}else if(job.has("pos")){
-								String st = (String) job.get("pos");
+							}else if(job.has("posicao")){
+								String st = (String) job.get("posicao");
 								String[] pos = st.split(",");
 								pos_atual[0] = Integer.parseInt(pos[0]);
 								pos_atual[1] = Integer.parseInt(pos[1]);							
