@@ -142,6 +142,7 @@ func RetornarTabuleiro() string {
 func broadcast(dados []byte) {
 	
 	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
+		fmt.Println(strconv.Itoa(_listadejogadores.jogadores[i].id))
 		_listadejogadores.jogadores[i].conexao.Write(dados)
 	}
 	

@@ -62,6 +62,7 @@ public class ClienteTCP implements Runnable {
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				
 				os.flush();
+				while(sock.isConnected()){	
 				final byte[] data = new byte[2048];
 				try {
 					InputStream is = sock.getInputStream();
@@ -90,6 +91,7 @@ public class ClienteTCP implements Runnable {
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.printStackTrace();
+				}
 				}
 				
 			}
