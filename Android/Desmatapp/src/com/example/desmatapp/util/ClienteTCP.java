@@ -67,6 +67,7 @@ public class ClienteTCP implements Runnable {
 				while(sock.isConnected()){	
 				final byte[] data = new byte[2048];
 				try {
+					sock.setKeepAlive(true);
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);
 					if(size>0){
@@ -128,6 +129,8 @@ public class ClienteTCP implements Runnable {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
 			os.writeBytes("sair");
 			os.flush();
+
+			sock.setKeepAlive(false);
 			sock.close();
 		} catch (IOException e) {
 			Log.e("ERROR", e.toString());
