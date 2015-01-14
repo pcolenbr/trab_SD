@@ -145,7 +145,7 @@ public class GameActivity extends Activity {
 			ib_up.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + " , " + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+					Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
 					
 				}
 			});

@@ -291,6 +291,8 @@ func handleRequest(conn net.Conn) {
 
 	if reqLen > 0 {
 		mensagem := string(buf[0:reqLen-1])
+
+		fmt.Println(mensagem)
 		cmd := strings.Split(mensagem, ":")
 
 		fmt.Println(cmd[0])
@@ -308,7 +310,22 @@ func handleRequest(conn net.Conn) {
 			//conn.Write(b)
 			broadcast(b)
 
-		} else if strings.EqualFold(cmd[0], string("moverJogador")) {
+		}
+
+	}
+
+	reader := bufio.NewReader(conn)
+	msg, err := reader.ReadString('\n')
+	if err != nil {
+	}
+
+	// Close the connection when you're done with it.
+		fmt.Println(msg)
+		cmd := strings.Split(msg, ":")
+
+		fmt.Println(cmd)
+
+		if strings.EqualFold(cmd[0], string("moverJogador")) {
 
 			id := cmd[1]
 			posAtual := cmd[2]
@@ -348,18 +365,4 @@ func handleRequest(conn net.Conn) {
 			fecharConexao(conn)
 
 		}
-
-	}
-
-	reader := bufio.NewReader(conn)
-	msg, err := reader.ReadString(' ')
-	if err != nil {
-	}
-
-	// Close the connection when you're done with it.
-	if strings.EqualFold(msg, "sair") {
-		fecharConexao(conn)
-	} else {
-		msg = ""
-	}
 }
