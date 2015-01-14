@@ -116,6 +116,7 @@ public class ClienteTCP implements Runnable {
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
+			os.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,7 +132,7 @@ public class ClienteTCP implements Runnable {
 		} catch (IOException e) {
 			Log.e("ERROR", e.toString());
 		}
-		if(sock.isClosed()){		
+		if(sock.isClosed()){
 			((Activity) context).runOnUiThread(new Runnable() {
 				
 				@Override

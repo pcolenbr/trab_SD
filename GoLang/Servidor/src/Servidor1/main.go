@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.219"
+	CONN_HOST    = "172.16.253.254"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -56,17 +56,17 @@ type ListaJogadores struct {
 }
 
 type Objeto struct {
-	id         int
-	tipo_obj   string
-	tipo_jog   string
+	id       int
+	tipo_obj string
+	tipo_jog string
 	//tempo de tempo do posicionamento?
 }
 
 func NovoObjetoVazio() *Objeto {
 	objeto := &Objeto{
-		id:         0,
-		tipo_obj:   VAZIO,
-		tipo_jog:   VAZIO,
+		id:       0,
+		tipo_obj: VAZIO,
+		tipo_jog: VAZIO,
 	}
 
 	return objeto
@@ -120,10 +120,9 @@ func RetornarTabuleiro() string {
 		for j := 0; j < 5; j++ {
 			retorno += "{"
 
-						retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
-						retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
-						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog
-						
+			retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
+			retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
+			retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog
 
 			if i == 4 && j == 4 {
 				retorno += "}"
@@ -140,12 +139,12 @@ func RetornarTabuleiro() string {
 }
 
 func broadcast(dados []byte) {
-	
+
 	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
 		fmt.Println(strconv.Itoa(_listadejogadores.jogadores[i].id))
 		_listadejogadores.jogadores[i].conexao.Write(dados)
 	}
-	
+
 }
 
 func InserirJogador(tipo string, conexao net.Conn) string {
@@ -172,7 +171,7 @@ func InserirJogador(tipo string, conexao net.Conn) string {
 	id := len(_listadejogadores.jogadores) + 1
 	jogador := NovoJogador(id, tipo, pos_linha, pos_coluna, conexao)
 	_listadejogadores.jogadores[id] = jogador
-	
+
 	_tabuleiro.objetos[pos_linha+","+pos_coluna].id = id
 	_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
@@ -198,7 +197,7 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	if strings.EqualFold(_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].tipo_jog, VAZIO) {
 		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].id = 0
 		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].tipo_jog = VAZIO
-		
+
 		_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].id = ident
 
@@ -290,7 +289,7 @@ func handleRequest(conn net.Conn) {
 	}
 
 	if reqLen > 0 {
-		mensagem := string(buf[0:reqLen-1])
+		mensagem := string(buf[0 : reqLen-1])
 		cmd := strings.Split(mensagem, ":")
 
 		fmt.Println(cmd[0])
@@ -298,54 +297,15 @@ func handleRequest(conn net.Conn) {
 		if strings.EqualFold(cmd[0], string("iniciarJogador")) {
 
 			tipo := cmd[1]
-			
+
 			fmt.Println("Inserir jogador")
 			id := InserirJogador(tipo, conn)
 			tab := RetornarTabuleiro()
-			
-			b := []byte(id + ";" +tab)
+
+			b := []byte(id + ";" + tab)
 
 			//conn.Write(b)
 			broadcast(b)
-
-		} else if strings.EqualFold(cmd[0], string("moverJogador")) {
-
-			id := cmd[1]
-			posAtual := cmd[2]
-			posDesejada := cmd[3]
-
-			fmt.Println("Mover jogador")
-			pos := MoverJogador(id, posAtual, posDesejada)
-			tab := RetornarTabuleiro()
-
-			b :=[]byte(pos + ";" + tab)
-
-			conn.Write(b)
-
-		} else if strings.EqualFold(cmd[0], string("plantar")) {
-
-			id := cmd[1]
-			pos := cmd[2]
-
-			plantar := Plantar(id, pos)
-			tab := RetornarTabuleiro()
-			b := []byte(plantar + ";" + tab)
-
-			conn.Write(b)
-
-		} else if strings.EqualFold(cmd[0], string("cortar")) {
-
-			id := cmd[1]
-			pos := cmd[2]
-
-			cortar := Cortar(id, pos)
-			tab := RetornarTabuleiro()
-
-			conn.Write([]byte(cortar + ";" + tab))
-
-		} else if strings.EqualFold(cmd[0], string("sair")) {
-
-			fecharConexao(conn)
 
 		}
 
@@ -354,6 +314,49 @@ func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	msg, err := reader.ReadString(' ')
 	if err != nil {
+		fmt.Println("Error reading message:", err.Error())
+	}
+
+	cmd := strings.Split(msg, ":")
+	if strings.EqualFold(cmd[0], string("moverJogador")) {
+
+		id := cmd[1]
+		posAtual := cmd[2]
+		posDesejada := cmd[3]
+		
+		fmt.Println("Mover jogador")
+		pos := MoverJogador(id, posAtual, posDesejada)
+		tab := RetornarTabuleiro()
+
+		b := []byte(pos + ";" + tab)
+
+		conn.Write(b)
+
+	} else if strings.EqualFold(cmd[0], string("plantar")) {
+
+		id := cmd[1]
+		pos := cmd[2]
+
+		plantar := Plantar(id, pos)
+		tab := RetornarTabuleiro()
+		b := []byte(plantar + ";" + tab)
+
+		conn.Write(b)
+
+	} else if strings.EqualFold(cmd[0], string("cortar")) {
+
+		id := cmd[1]
+		pos := cmd[2]
+
+		cortar := Cortar(id, pos)
+		tab := RetornarTabuleiro()
+
+		conn.Write([]byte(cortar + ";" + tab))
+
+	} else if strings.EqualFold(cmd[0], string("sair")) {
+
+		fecharConexao(conn)
+
 	}
 
 	// Close the connection when you're done with it.
