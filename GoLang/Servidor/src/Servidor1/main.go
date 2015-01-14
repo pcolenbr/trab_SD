@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.219"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -123,6 +123,7 @@ func RetornarTabuleiro() string {
 						retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
 						retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
 						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog
+						fmt.Print(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog)
 						
 
 			if i == 4 && j == 4 {
@@ -177,7 +178,7 @@ func InserirJogador(tipo string, conexao net.Conn) string {
 	_tabuleiro.objetos[pos_linha+","+pos_coluna].tipo_jog = tipo
 	fmt.Println("Inseriu o jogador")
 
-	return "{id:" + strconv.Itoa(id) + "}; {posicao: '" + pos_linha + "," + pos_coluna + "'}"
+	return "{\"id\":" + strconv.Itoa(id) + "}; {\"posicao\": \"" + pos_linha + "," + pos_coluna + "\"}"
 
 }
 
@@ -188,28 +189,23 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 		fmt.Println("Erro:", err.Error())
 		return posAtual
 	}
-	fmt.Println(posAtual)
+	posAtual = strings.TrimSpace(posAtual)
 	posicaoAtual := strings.Split(posAtual, ",")
-	fmt.Println(posicaoAtual)
-	
-	fmt.Println(posDesejada)
+	posicaoAtual[1] = strings.TrimSpace(posicaoAtual[1])
+	posAtual = strings.TrimSpace(posDesejada)
 	posicaoDesejada := strings.Split(posDesejada, ",")
-	fmt.Println(posicaoDesejada)
+	posicaoDesejada[1] = strings.TrimSpace(posicaoDesejada[1])
 	
-	fmt.Println(_tabuleiro.objetos[posDesejada].tipo_jog)
 
-	if strings.EqualFold(_tabuleiro.objetos[posDesejada].tipo_jog, VAZIO) {
+	if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) {
 		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
 		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
 		
 		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
-
-		fmt.Println("dentro if")
-		return "'posicao':" + posDesejada
+		
+		return "{\"posicao\": \"" + posDesejada + "\"}"
 	}
-
-		fmt.Println("fora if")
 	return "'posicao':" + posAtual
 
 }
@@ -278,7 +274,6 @@ func main() {
 
 func fecharConexao(conn net.Conn) {
 	fmt.Println("Jogador desconectado")
-
 	conn.Close()
 }
 
@@ -287,11 +282,12 @@ func handleRequest(conn net.Conn) {
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 	// Read the incoming connection into the buffer.
-
-	// Send a response back to person contacting us.
+	keep := true
+for (keep){
 	reqLen, err := conn.Read(buf)
 	if err != nil {
 		fmt.Println("Error reading buf:", err.Error())
+		keep = false
 	}
 
 	if reqLen > 0 {
@@ -325,16 +321,14 @@ func handleRequest(conn net.Conn) {
 	}
 
 	// Close the connection when you're done with it.
-		fmt.Println(msg)
 		cmd := strings.Split(msg, ":")
-
-		fmt.Println(cmd)
 
 		if strings.EqualFold(cmd[0], string("moverJogador")) {
 
 			id := cmd[1]
 			posAtual := cmd[2]
-			posDesejada := cmd[3]
+			posDesejada := strings.TrimSpace(cmd[3])
+			
 
 			fmt.Println("Mover jogador")
 			pos := MoverJogador(id, posAtual, posDesejada)
@@ -342,7 +336,8 @@ func handleRequest(conn net.Conn) {
 
 			b :=[]byte(pos + ";" + tab)
 
-			conn.Write(b)
+			
+			broadcast(b)
 
 		} else if strings.EqualFold(cmd[0], string("plantar")) {
 
@@ -370,4 +365,5 @@ func handleRequest(conn net.Conn) {
 			fecharConexao(conn)
 
 		}
+	}
 }

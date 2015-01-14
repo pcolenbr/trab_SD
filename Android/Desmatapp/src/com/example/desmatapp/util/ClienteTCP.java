@@ -67,7 +67,6 @@ public class ClienteTCP implements Runnable {
 				while(sock.isConnected()){	
 				final byte[] data = new byte[2048];
 				try {
-					sock.setKeepAlive(true);
 					InputStream is = sock.getInputStream();
 					int size = is.read(data);
 					if(size>0){
@@ -83,19 +82,13 @@ public class ClienteTCP implements Runnable {
 								String st = (String) job.get("posicao");
 								String[] pos = st.split(",");
 								pos_atual[0] = Integer.parseInt(pos[0]);
-								pos_atual[1] = Integer.parseInt(pos[1]);							
+								pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));							
 							} 
 							else if(job.has("objetos")){
 								JSONArray ja = job.getJSONArray("objetos");
 								((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 							}							
-						}
-//						if (res[0].con("id")){
-//							this.id = Integer.parseInt(res[1]); 
-//						}
-//						if (res[1])
-						
-						
+						}						
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -116,6 +109,7 @@ public class ClienteTCP implements Runnable {
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
 			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna+"\n");
 			os.flush();
 		} catch (IOException e) {

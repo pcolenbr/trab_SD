@@ -145,7 +145,8 @@ public class GameActivity extends Activity {
 			ib_up.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+					if(Globals.cliente.pos_atual[0]>=1)
+						Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
 					
 				}
 			});
@@ -153,21 +154,25 @@ public class GameActivity extends Activity {
 			ib_right.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
+					if(Globals.cliente.pos_atual[1]<=3)
+						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
 				}
 			});
 			ib_down = (ImageButton) findViewById(R.id.ib_down);
 			ib_down.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
+					if(Globals.cliente.pos_atual[0]<=3)
+						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
 				}
 			});
 			ib_left = (ImageButton) findViewById(R.id.ib_left);
 			ib_left.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
+					if(Globals.cliente.pos_atual[1]>=1)
+						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
+					
 				}
 			});
 			
@@ -226,6 +231,8 @@ public class GameActivity extends Activity {
 									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
 									break;
 								default:
+									Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
+									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);
 									break;
 							}
 							
