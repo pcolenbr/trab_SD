@@ -122,7 +122,7 @@ public class ClienteTCP implements Runnable {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-		return pos_atual;
+		return "";
 	}
 	
 	public void FecharConexao(){
