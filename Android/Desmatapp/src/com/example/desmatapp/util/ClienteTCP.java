@@ -102,11 +102,11 @@ public class ClienteTCP implements Runnable {
 		
 	}
 	
-	public String MoverJogador(int id, String pos_atual, String pos_desejada){
+	public String MoverJogador(int id, String var_linha, String var_coluna){
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("moverJogador:" + id +":"+ pos_atual+":"+pos_desejada+"\n");
+			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
