@@ -135,7 +135,7 @@ public class ClienteTCP implements Runnable {
 		} catch (IOException e) {
 			Log.e("ERROR", e.toString());
 		}
-		if(sock.isClosed()){		
+		if(sock.isClosed()){
 			((Activity) context).runOnUiThread(new Runnable() {
 				
 				@Override
