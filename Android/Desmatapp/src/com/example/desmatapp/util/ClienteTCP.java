@@ -116,7 +116,7 @@ public class ClienteTCP implements Runnable {
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
+			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna+"\n");
 			os.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

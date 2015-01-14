@@ -188,23 +188,28 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 		fmt.Println("Erro:", err.Error())
 		return posAtual
 	}
+	fmt.Println(posAtual)
+	posicaoAtual := strings.Split(posAtual, ",")
+	fmt.Println(posicaoAtual)
+	
+	fmt.Println(posDesejada)
+	posicaoDesejada := strings.Split(posDesejada, ",")
+	fmt.Println(posicaoDesejada)
+	
+	fmt.Println(_tabuleiro.objetos[posDesejada].tipo_jog)
 
-	linhaAtual := strings.Split(posAtual, ",")
-	colunaAtual := strings.Split(posAtual, ",")
-
-	linhaDesejada := strings.Split(posDesejada, ",")
-	colunaDesejada := strings.Split(posDesejada, ",")
-
-	if strings.EqualFold(_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].tipo_jog, VAZIO) {
-		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].id = 0
-		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].tipo_jog = VAZIO
+	if strings.EqualFold(_tabuleiro.objetos[posDesejada].tipo_jog, VAZIO) {
+		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
+		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
 		
-		_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].tipo_jog = _listadejogadores.jogadores[ident].tipo
-		_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].id = ident
+		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
+		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
 
+		fmt.Println("dentro if")
 		return "'posicao':" + posDesejada
 	}
 
+		fmt.Println("fora if")
 	return "'posicao':" + posAtual
 
 }
