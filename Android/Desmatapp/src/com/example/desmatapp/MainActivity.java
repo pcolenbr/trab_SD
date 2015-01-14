@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ip_servidor = "192.168.0.140";
+        ip_servidor = "172.16.253.219";
         porta_servidor = 3333;
         SetComponents();
     }
@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Iniciar o jogo como plantador
-				Globals.cliente = new ClienteTCP(MainActivity.this, ip_servidor, porta_servidor,PLANTADOR);
+				Globals.cliente = new ClienteTCP(ip_servidor, porta_servidor,PLANTADOR);
 				new Thread(Globals.cliente).start();
 				Intent intent = new Intent(MainActivity.this, GameActivity.class);
 				intent.putExtra("tipo_jogador", PLANTADOR);
@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Iniciar o jogo como lenhador
-				Globals.cliente = new ClienteTCP(MainActivity.this, ip_servidor, porta_servidor,LENHADOR);
+				Globals.cliente = new ClienteTCP(ip_servidor, porta_servidor,LENHADOR);
 				new Thread(Globals.cliente).start();
 				Intent intent = new Intent(MainActivity.this, GameActivity.class);
 				intent.putExtra("tipo_jogador", LENHADOR);

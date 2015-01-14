@@ -6,11 +6,15 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.example.desmatapp.GameActivity;
 
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class ClienteTCP implements Runnable{
@@ -21,16 +25,24 @@ public class ClienteTCP implements Runnable{
 	private Socket sock;
 	private int tipo;
 	public int id;
+	public ImageView[][] tabuleiro;
 
-	public ClienteTCP(Context context, String ip, int porta, int tipo) {
+	public ClienteTCP(String ip, int porta, int tipo) {
 
 		this.ip = ip;
 		this.porta = porta;
-		this.context = context;
 		this.sock = null;
 		this.tipo = tipo;
+		this.tabuleiro = new ImageView[5][5];
 	}
+	
+	public void setContext(Context context){
 
+		this.context = context;
+	}
+	public Context getContext(){
+		return this.context;
+	}
 	
 
 	@Override
@@ -61,8 +73,20 @@ public class ClienteTCP implements Runnable{
 							for (int i = 0; i< res.length; i++){
 								JSONObject job = new JSONObject(res[i]);
 								if (job.has("id")){
-									job.get("id");
-									
+									this.id = (Integer) job.get("id");									
+								}
+								if(job.has("objetos")){
+									int cont = 0;
+									JSONArray ja = job.getJSONArray("objetos");
+									for(int j=0; j<5;j++){
+										for(int y=0; y<5;y++){ 
+											GameActivity ga = (GameActivity) ((Activity)context);
+											ga.redesenharTabuleiro(ja.getJSONObject(cont).getInt("tipoObj"), 
+																	ja.getJSONObject(cont).getInt("tipoJog"),
+																	j, y);
+											
+										}
+									}
 								}
 								
 								
