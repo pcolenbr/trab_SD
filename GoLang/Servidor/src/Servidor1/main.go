@@ -139,6 +139,14 @@ func RetornarTabuleiro() string {
 
 }
 
+func broadcast(dados []byte) {
+	
+	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
+		_listadejogadores.jogadores[i].conexao.Write(dados)
+	}
+	
+}
+
 func InserirJogador(tipo string, conexao net.Conn) string {
 	rand.Seed(time.Now().Unix())
 
@@ -296,7 +304,8 @@ func handleRequest(conn net.Conn) {
 			
 			b := []byte(id + ";" +tab)
 
-			conn.Write(b)
+			//conn.Write(b)
+			broadcast(b)
 
 		} else if strings.EqualFold(cmd[0], string("mover")) {
 
