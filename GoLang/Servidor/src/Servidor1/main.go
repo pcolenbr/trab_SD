@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.254"
+	CONN_HOST    = "172.16.253.219"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -195,7 +195,7 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	linhaDesejada := strings.Split(posDesejada, ",")
 	colunaDesejada := strings.Split(posDesejada, ",")
 
-	if strings.EqualFold(_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].tipo_jog, VAZIO) {
+	if strings.EqualFold(_tabuleiro.objetos[linhaDesejada[0]+","+colunaDesejada[0]].tipo_jog, VAZIO) {
 		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].id = 0
 		_tabuleiro.objetos[linhaAtual[0]+","+colunaAtual[0]].tipo_jog = VAZIO
 		
@@ -308,7 +308,7 @@ func handleRequest(conn net.Conn) {
 			//conn.Write(b)
 			broadcast(b)
 
-		} else if strings.EqualFold(cmd[0], string("mover")) {
+		} else if strings.EqualFold(cmd[0], string("moverJogador")) {
 
 			id := cmd[1]
 			posAtual := cmd[2]

@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ip_servidor = "172.16.253.254";
+        ip_servidor = "172.16.253.219";
         porta_servidor = 3333;
         SetComponents();
     }

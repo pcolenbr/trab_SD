@@ -145,32 +145,29 @@ public class GameActivity extends Activity {
 			ib_up.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					//String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id,"+1" , "0").split(",");					
-					//set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
+					Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + " , " + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+					
 				}
 			});
 			ib_right = (ImageButton) findViewById(R.id.ib_right);
 			ib_right.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1))).split(",");					
-					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
+					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
 				}
 			});
 			ib_down = (ImageButton) findViewById(R.id.ib_down);
 			ib_down.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1])).split(",");
-					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
+					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
 				}
 			});
 			ib_left = (ImageButton) findViewById(R.id.ib_left);
 			ib_left.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					String[] s = (Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1))).split(",");					
-					set_posicao(Integer.parseInt(s[0]),Integer.parseInt(s[1]));
+					Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
 				}
 			});
 			
@@ -186,73 +183,7 @@ public class GameActivity extends Activity {
 			return Globals.cliente.pos_atual;
 		}*/
 
-		private void set_posicao(int i, int j) {
-			// TODO Inserir código para enviar requisição ao servidor
-			//Código abaixo somente para testes
-			int[] pos_futura = new int[2];
-			pos_futura[0] = i;
-			pos_futura[1] = j;
-			//Tratar fronteiras
-			if(i>4){
-				pos_futura[0] = 4;
-			}
-			if(j>4){
-				pos_futura[1] = 4;
-			}
-			if(i<0){
-				pos_futura[0] = 0;
-			}
-			if(j<0){
-				pos_futura[1] = 0;
-			}
-			int ImgPosFutura = (Integer) Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].getTag();
-			switch (acao) {
-			case CERCA:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.fence);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.fence);
-				acao = 0;
-				break;
-			case CORTAR:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);	
-				acao = 0;	
-				break;
-			case DESTRUIR:
-				//TODO colocar um tempo
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.empty);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);
-				acao = 0;				
-				break;
-			case PLANTAR:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.tree);
-				acao = 0;				
-				break;
-			case REGAR:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(R.drawable.tree);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.tree);
-				acao = 0;				
-				break;
-			default:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setTag(ImgPosFutura);
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(ImgPosFutura);
-				acao = 0;
-				break;
-			}
-			switch (tipo) {
-			case PLANTADOR:
-				Globals.cliente.tabuleiro[pos_futura[0]][pos_futura[1]].setImageResource(R.drawable.plant);				
-				break;
-			case LENHADOR:
-				Globals.cliente.tabuleiro[pos_futura[0]][pos_futura[1]].setImageResource(R.drawable.lenh);				
-				break;
-			default:
-				Globals.cliente.tabuleiro[pos_futura[0]][pos_futura[1]].setImageResource(R.drawable.empty);
-				break;
-			}
-			Globals.cliente.pos_atual = pos_futura;			
-		}
-		
+				
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
 			runOnUiThread(new Runnable() {
 				

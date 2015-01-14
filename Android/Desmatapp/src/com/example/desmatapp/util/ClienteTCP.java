@@ -111,7 +111,7 @@ public class ClienteTCP implements Runnable {
 		
 	}
 	
-	public String MoverJogador(int id, String var_linha, String var_coluna){
+	public void MoverJogador(int id, String var_linha, String var_coluna){
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
@@ -120,18 +120,6 @@ public class ClienteTCP implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		final byte[] data = new byte[2048];
-		try {
-			InputStream is = sock.getInputStream();
-			int size = is.read(data);
-			if(size>0){
-				return new String(data);			
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return "";
 	}
 	
 	public void FecharConexao(){
