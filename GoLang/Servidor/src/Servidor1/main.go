@@ -145,7 +145,7 @@ func broadcast(dados []byte) {
 		_,err := _listadejogadores.jogadores[i].conexao.Write(dados)
 		if err != nil {
 			//TODO Finalizar e remover a conexao/jogador da lista e do tabuleiro
-			fmt.Println("Erro:", err.Error())
+			fmt.Println("Broadcast - Erro:", err.Error())
 		}
 	}
 	
@@ -214,8 +214,16 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 
 func Plantar(id string, pos string) string {
 
+	fmt.Println(pos)
+	pos = strings.TrimSpace(pos)
+	
+	fmt.Println(pos)
+	
 	linha := strings.Split(pos, ",")
 	coluna := strings.Split(pos, ",")
+	
+	fmt.Println("Linha:" + linha[0])
+	fmt.Println("Coluna:" + coluna[0])
 
 	if strings.EqualFold(_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj, VAZIO) {
 		_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj = ARVORE
@@ -241,7 +249,7 @@ func Cortar(id string, pos string) string {
 	return "'cortar' : false"
 }
 
-func removerJogador(id string) bool {
+func removerJogador(id string, posAtual string) bool {
 	
 	ident, err := strconv.Atoi(id)
 	if err != nil {
@@ -249,7 +257,11 @@ func removerJogador(id string) bool {
 		return false
 	}
 	
-	_listadejogadores.jogadores[ident].conexao.Close()
+	linha := strings.Split(posAtual, ",")
+	coluna := strings.Split(posAtual, ",")
+	
+	_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_jog = VAZIO
+	
 	delete(_listadejogadores.jogadores, ident)
 	fmt.Println("Jogador removido da lista")
 	
@@ -286,13 +298,12 @@ func main() {
 			}(conn)
 		}
 		// Handle connections in a new goroutine.
+		
 	}
 }
 
 
 func HandleRequest(conn net.Conn) {
-	
-	log.Printf("Aqui")
 	
 	buf := make([]byte, 1024)
 	keep := true
@@ -345,13 +356,14 @@ func HandleRequest(conn net.Conn) {
 			} else if strings.EqualFold(cmd[0], string("plantar")) {
 	
 				id := cmd[1]
-				pos := cmd[2]
+				pos := strings.TrimSpace(cmd[2])
 	
+				fmt.Println("Plantar")	
 				plantar := Plantar(id, pos)
 				tab := RetornarTabuleiro()
 				b := []byte(plantar + ";" + tab)
-	
-				conn.Write(b)
+		
+				broadcast(b)
 	
 			} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -366,9 +378,10 @@ func HandleRequest(conn net.Conn) {
 			} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 				fmt.Println("Sair")
-				id := strings.TrimSpace(cmd[1])
-				removerJogador(id)
-	
+				id := cmd[1]
+				posAtual := strings.TrimSpace(cmd[2])
+				removerJogador(id, posAtual)
+				keep = false;
 			}
 		}
 
@@ -398,13 +411,14 @@ func HandleRequest(conn net.Conn) {
 		} else if strings.EqualFold(cmd[0], string("plantar")) {
 	
 			id := cmd[1]
-			pos := cmd[2]
+			pos := strings.TrimSpace(cmd[2])
 	
+			fmt.Println("Plantar")
 			plantar := Plantar(id, pos)
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
 	
-			conn.Write(b)
+			broadcast(b)
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -419,9 +433,10 @@ func HandleRequest(conn net.Conn) {
 		} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 			fmt.Println("Sair")
-			id := strings.TrimSpace(cmd[1])
-			removerJogador(id)
-			conn.Close()
+			id := cmd[1]
+			posAtual := strings.TrimSpace(cmd[2])
+			removerJogador(id, posAtual)
+			keep = false;
 		}
 	}
 }

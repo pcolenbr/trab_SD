@@ -92,6 +92,8 @@ public class ClienteTCP implements Runnable {
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 									
+								} else if ( job.has("plantar") ) {
+									//TODO calcular pontos?
 								}
 							}						
 						}
@@ -106,12 +108,24 @@ public class ClienteTCP implements Runnable {
 		
 	}
 	
-	public void MoverJogador(int id, String var_linha, String var_coluna){
+	public void MoverJogador(int id, String posAtual, String posDesejada){
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.flush();
-			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
+			os.writeBytes("moverJogador:" + id + ":" + posAtual + ":" + posDesejada + "\n");
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void Plantar(int id, String pos) {
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("plantar:" + id + ":" + pos + "\n");
 			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -121,7 +135,7 @@ public class ClienteTCP implements Runnable {
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair:" + id + "\n");
+			os.writeBytes("sair:" + id + ":" + pos_atual[0] + "," + pos_atual[1] + "\n");
 			os.flush();
 			
 			sock.setKeepAlive(false);
