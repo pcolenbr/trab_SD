@@ -1,6 +1,5 @@
 package com.example.desmatapp;
 
-import java.util.Calendar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,9 +20,7 @@ public class GameActivity extends Activity {
 		
 		private ImageButton ib_up, ib_right, ib_down, ib_left;
 		//private int[] Globals.cliente.pos_atual;
-		private int tipo,acao;
-
-		private JSONArray ultimo_tabuleiro;
+		private int tipo;
 		// Tipos de jogadores
 		private static final int PLANTADOR = 1;
 		private static final int LENHADOR = 2;
@@ -72,16 +69,14 @@ public class GameActivity extends Activity {
 				bt_act1.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// TODO Ação regar
-						acao = REGAR;						
+						// TODO Ação regar				
 					}
 				});
 				bt_act2.setText(R.string.cerc);
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						// TODO Ação Construir Cerca		
-						acao = CERCA;								
+						Globals.cliente.Cerca( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);								
 					}
 				});
 				bt_act3.setText(R.string.arv); 
@@ -100,16 +95,14 @@ public class GameActivity extends Activity {
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						// TODO Ação cortar		
-						acao = CORTAR;
+						Globals.cliente.Cortar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);
 					}
 				});
 				bt_act3.setText(R.string.dest);
 				bt_act3.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						// TODO Ação destruir		
-						acao = DESTRUIR;
+						// TODO Ação destruir	
 					}
 				});
 			}
@@ -195,7 +188,6 @@ public class GameActivity extends Activity {
 
 				
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
-			this.ultimo_tabuleiro = dados;
 			runOnUiThread(new Runnable() {
 				
 				@Override
