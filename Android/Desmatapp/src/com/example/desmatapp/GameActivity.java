@@ -146,7 +146,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if(Globals.cliente.pos_atual[0]>=1)
-						Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[0], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+						Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
 					
 				}
 			});

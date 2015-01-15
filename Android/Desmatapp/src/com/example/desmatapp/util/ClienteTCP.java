@@ -121,7 +121,7 @@ public class ClienteTCP implements Runnable {
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair");
+			os.writeBytes("sair:"+id);
 			os.flush();
 
 			sock.setKeepAlive(false);

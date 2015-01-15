@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "172.16.253.219"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -143,7 +143,6 @@ func RetornarTabuleiro() string {
 func broadcast(dados []byte) {
 	
 	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
-		fmt.Println(strconv.Itoa(_listadejogadores.jogadores[i].id))
 		_listadejogadores.jogadores[i].conexao.Write(dados)
 	}
 	
@@ -196,10 +195,10 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	posicaoDesejada := strings.Split(posDesejada, ",")
 	posicaoDesejada[1] = strings.TrimSpace(posicaoDesejada[1])
 	
-
+	
 	if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) {
-		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
 		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
+		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
 		
 		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
@@ -310,6 +309,49 @@ for (keep){
 
 			//conn.Write(b)
 			broadcast(b)
+
+		}
+		
+		if strings.EqualFold(cmd[0], string("moverJogador")) {
+
+			id := cmd[1]
+			posAtual := cmd[2]
+			posDesejada := strings.TrimSpace(cmd[3])
+			
+
+			fmt.Println("Mover jogador")
+			pos := MoverJogador(id, posAtual, posDesejada)
+			tab := RetornarTabuleiro()
+
+			b :=[]byte(pos + ";" + tab)
+
+			
+			broadcast(b)
+
+		} else if strings.EqualFold(cmd[0], string("plantar")) {
+
+			id := cmd[1]
+			pos := cmd[2]
+
+			plantar := Plantar(id, pos)
+			tab := RetornarTabuleiro()
+			b := []byte(plantar + ";" + tab)
+
+			conn.Write(b)
+
+		} else if strings.EqualFold(cmd[0], string("cortar")) {
+
+			id := cmd[1]
+			pos := cmd[2]
+
+			cortar := Cortar(id, pos)
+			tab := RetornarTabuleiro()
+
+			conn.Write([]byte(cortar + ";" + tab))
+
+		} else if strings.EqualFold(cmd[0], string("sair")) {
+
+			fecharConexao(conn)
 
 		}
 
