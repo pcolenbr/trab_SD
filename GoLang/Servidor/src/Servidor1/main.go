@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "192.168.0.140"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -140,13 +140,14 @@ func RetornarTabuleiro() string {
 }
 
 func broadcast(dados []byte) {
+	
 	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
 		_,err := _listadejogadores.jogadores[i].conexao.Write(dados)
-		if err != nil{
-			fmt.Println(err.Error())
+		if err != nil {
+			//TODO Finalizar e remover a conexao/jogador da lista e do tabuleiro
+			fmt.Println("Erro:", err.Error())
 		}
 	}
-	
 	
 }
 
@@ -240,13 +241,27 @@ func Cortar(id string, pos string) string {
 	return "'cortar' : false"
 }
 
+func removerJogador(id string) bool {
+	
+	ident, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println("Erro:", err.Error())
+		return false
+	}
+	
+	_listadejogadores.jogadores[ident].conexao.Close()
+	delete(_listadejogadores.jogadores, ident)
+	fmt.Println("Jogador removido da lista")
+	
+	return true
+}
+
 func main() {
-	fmt.Println("Criando o tabuleiro")
 	_tabuleiro = NovoTabuleiro()
 	fmt.Println("Tabuleiro Criado")
-	fmt.Println("Criando uma lista de jogadores")
 	_listadejogadores = NovaListaJogadores()
-	fmt.Println("Lista Criada")
+	fmt.Println("Lista de Jogadores Criada")
+	
 	// Escutar novas conexões.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
@@ -254,6 +269,7 @@ func main() {
 		os.Exit(1)
 	}
 	defer l.Close()
+	
 	fmt.Println("Escutando o servidor " + CONN_HOST + ":" + CONN_PORT)
 	sem := make(chan bool, MAXJOGADORES)
 	for {
@@ -266,147 +282,146 @@ func main() {
 			sem <- true
 			go func(net.Conn) {
 				defer func() { <-sem }()
-				go handleRequest(conn)
+				go HandleRequest(conn)
 			}(conn)
 		}
 		// Handle connections in a new goroutine.
 	}
 }
 
-func fecharConexao(conn net.Conn) {
-	fmt.Println("Jogador desconectado")
-	conn.Close()
-}
 
-// Handles incoming requests.
-func handleRequest(conn net.Conn) {
-	// Make a buffer to hold incoming data.
+func HandleRequest(conn net.Conn) {
+	
+	log.Printf("Aqui")
+	
 	buf := make([]byte, 1024)
-	// Read the incoming connection into the buffer.
 	keep := true
-for (keep){
-	reqLen, err := conn.Read(buf)
-	if err != nil {
-		fmt.Println("Error reading buf:", err.Error())
-		keep = false
-	}
 
-	if reqLen > 0 {
-		mensagem := string(buf[0:reqLen-1])
-
-		fmt.Println(mensagem)
-		cmd := strings.Split(mensagem, ":")
-
-		fmt.Println(cmd[0])
-
-		if strings.EqualFold(cmd[0], string("iniciarJogador")) {
-
-			tipo := cmd[1]
-			
-			fmt.Println("Inserir jogador")
-			id := InserirJogador(tipo, conn)
-			tab := RetornarTabuleiro()
-			
-			b := []byte(id + ";" +tab)
-			
-			broadcast(b)
-
+	for (keep) {
+		reqLen, err := conn.Read(buf)
+		if err != nil {
+			fmt.Println("Error reading buf:", err.Error())
+			keep = false
 		}
+
+		if (reqLen > 0) {
+			mensagem := string(buf[0:reqLen-1])
+
+			fmt.Println(mensagem)
+			cmd := strings.Split(mensagem, ":")
+
+			fmt.Println(cmd[0])
+
+			if strings.EqualFold(cmd[0], string("iniciarJogador")) {
+
+				tipo := cmd[1]
+			
+				fmt.Println("Inserir jogador")
+				id := InserirJogador(tipo, conn)
+				tab := RetornarTabuleiro()
+				
+				b := []byte(id + ";" +tab)
+	
+				broadcast(b)
+	
+			}
 		
-		if strings.EqualFold(cmd[0], string("moverJogador")) {
-
-			id := cmd[1]
-			posAtual := cmd[2]
-			posDesejada := strings.TrimSpace(cmd[3])
-			
-
-			fmt.Println("Mover jogador")
-			pos := MoverJogador(id, posAtual, posDesejada)
-			tab := RetornarTabuleiro()
-
-			b :=[]byte(pos + ";" + tab)
-
-			
-			broadcast(b)
-
-		} else if strings.EqualFold(cmd[0], string("plantar")) {
-
-			id := cmd[1]
-			pos := cmd[2]
-
-			plantar := Plantar(id, pos)
-			tab := RetornarTabuleiro()
-			b := []byte(plantar + ";" + tab)
-
-			conn.Write(b)
-
-		} else if strings.EqualFold(cmd[0], string("cortar")) {
-
-			id := cmd[1]
-			pos := cmd[2]
-
-			cortar := Cortar(id, pos)
-			tab := RetornarTabuleiro()
-
-			conn.Write([]byte(cortar + ";" + tab))
-
-		} else if strings.EqualFold(cmd[0], string("sair")) {
-
-			fecharConexao(conn)
-
+			if strings.EqualFold(cmd[0], string("moverJogador")) {
+	
+				id := cmd[1]
+				posAtual := cmd[2]
+				posDesejada := strings.TrimSpace(cmd[3])
+				
+	
+				fmt.Println("Mover jogador")
+				pos := MoverJogador(id, posAtual, posDesejada)
+				tab := RetornarTabuleiro()
+	
+				b :=[]byte(pos + ";" + tab)
+	
+				
+				broadcast(b)
+	
+			} else if strings.EqualFold(cmd[0], string("plantar")) {
+	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				plantar := Plantar(id, pos)
+				tab := RetornarTabuleiro()
+				b := []byte(plantar + ";" + tab)
+	
+				conn.Write(b)
+	
+			} else if strings.EqualFold(cmd[0], string("cortar")) {
+	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				cortar := Cortar(id, pos)
+				tab := RetornarTabuleiro()
+	
+				conn.Write([]byte(cortar + ";" + tab))
+	
+			} else if strings.EqualFold(cmd[0], string("sair")) {
+				
+				fmt.Println("Sair")
+				id := strings.TrimSpace(cmd[1])
+				removerJogador(id)
+	
+			}
 		}
 
-	}
-
-	reader := bufio.NewReader(conn)
-	msg, err := reader.ReadString('\n')
-	if err != nil {
-	}
-
-	// Close the connection when you're done with it.
+		reader := bufio.NewReader(conn)
+		msg, err := reader.ReadString('\n')
+		if err != nil {
+		}
+	
+		// Close the connection when you're done with it.
 		cmd := strings.Split(msg, ":")
-
+	
 		if strings.EqualFold(cmd[0], string("moverJogador")) {
-
+	
 			id := cmd[1]
 			posAtual := cmd[2]
 			posDesejada := strings.TrimSpace(cmd[3])
-			
-
+				
+	
 			fmt.Println("Mover jogador")
 			pos := MoverJogador(id, posAtual, posDesejada)
 			tab := RetornarTabuleiro()
-
+	
 			b :=[]byte(pos + ";" + tab)
-
-			
+				
 			broadcast(b)
-
+	
 		} else if strings.EqualFold(cmd[0], string("plantar")) {
-
+	
 			id := cmd[1]
 			pos := cmd[2]
-
+	
 			plantar := Plantar(id, pos)
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
-
+	
 			conn.Write(b)
-
+	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
-
+	
 			id := cmd[1]
 			pos := cmd[2]
-
+	
 			cortar := Cortar(id, pos)
 			tab := RetornarTabuleiro()
-
+	
 			conn.Write([]byte(cortar + ";" + tab))
-
+	
 		} else if strings.EqualFold(cmd[0], string("sair")) {
-
-			fecharConexao(conn)
-
+				
+			fmt.Println("Sair")
+			id := strings.TrimSpace(cmd[1])
+			removerJogador(id)
+			conn.Close()
 		}
 	}
 }
