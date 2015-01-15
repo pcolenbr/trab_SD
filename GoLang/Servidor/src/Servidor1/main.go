@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.0.140"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -219,8 +219,8 @@ func Plantar(id string, pos string) string {
 	posicao := strings.Split(pos, ",")
 	
 
-	if strings.EqualFold(_tabuleiro.objetos[posicao[0] + "," + posicao[1]].tipo_obj, VAZIO) {
-		_tabuleiro.objetos[posicao[0] + "," + posicao[1]].tipo_obj = ARVORE
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
 
 		return "'plantar' : true"
 	}
@@ -352,9 +352,9 @@ func HandleRequest(conn net.Conn) {
 				pos := cmd[2]
 	
 				fmt.Println("Plantar")
-				plantar := Plantar(id, pos)
+				Plantar(id, pos)
 				tab := RetornarTabuleiro()
-				b := []byte(plantar + ";" + tab)
+				b := []byte(tab)
 	
 				broadcast(b)
 	
