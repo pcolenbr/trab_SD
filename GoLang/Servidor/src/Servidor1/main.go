@@ -198,21 +198,35 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	posicaoDesejada := strings.Split(posDesejada, ",")
 	posicaoDesejada[1] = strings.TrimSpace(posicaoDesejada[1])
 	
-	
-	if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) {
-		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
-		_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
+	if(_listadejogadores.jogadores[ident].tipo == LENHADOR){
+		if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) &&
+		!strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_obj, CERCA) {
+			_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
+			_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
+			
+			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
+			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+			
+			return "{\"posicao\": \"" + posDesejada + "\"}"
+		}
+	} else {
+			if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) &&
+			!strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_obj, CERCA) {
+				_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
+				_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
+				
+				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
+				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+				
+				return "{\"posicao\": \"" + posDesejada + "\"}"
+		}
 		
-		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
-		_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
-		
-		return "{\"posicao\": \"" + posDesejada + "\"}"
 	}
 	return "'posicao':" + posAtual
 
 }
 
-func Plantar(id string, pos string) string {
+func Plantar(id string, pos string) bool {
 
 	pos = strings.TrimSpace(pos)
 
@@ -222,25 +236,45 @@ func Plantar(id string, pos string) string {
 	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
 
-		return "'plantar' : true"
+		return true
 	}
 
-	return "'plantar' : false"
+	return false
 
 }
 
-func Cortar(id string, pos string) string {
+func Cortar (id string, pos string) bool {
 
-	linha := strings.Split(pos, ",")
-	coluna := strings.Split(pos, ",")
+	pos = strings.TrimSpace(pos)
 
-	if strings.EqualFold(_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj, ARVORE) {
-		_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj = VAZIO
+	posicao := strings.Split(pos, ",")
+	
 
-		return "'cortar' : true"
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) {
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
+
+		return true
 	}
 
-	return "'cortar' : false"
+	return false
+
+}
+
+func Cerca (id string, pos string) bool {
+
+	pos = strings.TrimSpace(pos)
+
+	posicao := strings.Split(pos, ",")
+	
+
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = CERCA
+
+		return true
+	}
+
+	return false
+
 }
 
 func removerJogador(id string) bool {
@@ -352,21 +386,36 @@ func HandleRequest(conn net.Conn) {
 				pos := cmd[2]
 	
 				fmt.Println("Plantar")
-				Plantar(id, pos)
-				tab := RetornarTabuleiro()
-				b := []byte(tab)
-	
-				broadcast(b)
+				if(Plantar(id, pos)){
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+		
+					broadcast(b)
+				}
 	
 			} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
 				id := cmd[1]
 				pos := cmd[2]
 	
-				cortar := Cortar(id, pos)
-				tab := RetornarTabuleiro()
+				if(Cortar(id, pos)){
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+		
+					broadcast(b)
+				}
 	
-				conn.Write([]byte(cortar + ";" + tab))
+			} else if strings.EqualFold(cmd[0], string("cerca")) {
+	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				if(Cerca(id, pos)){
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+		
+					broadcast(b)
+				}
 	
 			} else if strings.EqualFold(cmd[0], string("sair")) {
 				
@@ -415,22 +464,37 @@ func HandleRequest(conn net.Conn) {
 			pos := cmd[2]
 	
 			fmt.Println("Plantar")
-			plantar := Plantar(id, pos)
-			tab := RetornarTabuleiro()
-			b := []byte(plantar + ";" + tab)
+			if(Plantar(id, pos)){
+				tab := RetornarTabuleiro()
+				b := []byte(tab)
 	
-			broadcast(b)
+				broadcast(b)
+			}
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				if(Cortar(id, pos)){
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+		
+					broadcast(b)
+				}
+	
+		} else if strings.EqualFold(cmd[0], string("cerca")) {
+	
 			id := cmd[1]
 			pos := cmd[2]
+
+			if(Cerca(id, pos)){
+				tab := RetornarTabuleiro()
+				b := []byte(tab)
 	
-			cortar := Cortar(id, pos)
-			tab := RetornarTabuleiro()
-	
-			conn.Write([]byte(cortar + ";" + tab))
-	
+				broadcast(b)
+			}
+
 		} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 			fmt.Println("Sair")

@@ -152,6 +152,30 @@ public class ClienteTCP implements Runnable {
 		}
 	}
 	
+	public void Cortar(String pos){
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("cortar:" + id + ":" + pos + "\n");
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void Cerca(String pos){
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("cerca:" + id + ":" + pos + "\n");
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
