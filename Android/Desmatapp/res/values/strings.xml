@@ -23,5 +23,7 @@
     <string name="title_activity_game">Desmatapp</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="Aguar_Jog">Aguardando jogador</string>
+    <string name="Info_serv">Obtendo informações do servidor</string>
 
 </resources>

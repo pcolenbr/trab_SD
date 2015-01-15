@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
@@ -197,6 +198,7 @@ public class GameActivity extends Activity {
 				
 				@Override
 				public void run() {
+					((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
 					int count = 0;					
 					int obj = 0;
 					int jog = 0;
