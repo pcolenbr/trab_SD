@@ -4,18 +4,18 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.SocketException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.example.desmatapp.GameActivity;
 
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.desmatapp.GameActivity;
 
 public class ClienteTCP implements Runnable {
 	private String ip;
@@ -64,43 +64,44 @@ public class ClienteTCP implements Runnable {
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				
 				os.flush();
-				while(sock.isConnected()){	
-				final byte[] data = new byte[2048];
-				try {
-					InputStream is = sock.getInputStream();
-					int size = is.read(data);
-					if(size>0){
-						final String s = new String(data);
-						String[] res = s.split(";");
-						
-						for (int i = 0; i< res.length; i++){
-							JSONObject job = new JSONObject(res[i]);
+				while ( true ) {
+					if(sock.isConnected()) {
+						final byte[] data = new byte[2048];
+						InputStream is = sock.getInputStream();
+						int size = is.read(data);
+						if ( size > 0 ) {
+							final String s = new String(data);
+							String[] res = s.split(";");
 							
-							if (job.has("id")){
-								this.id = (Integer) job.get("id");									
-							}else if(job.has("posicao")){
-								String st = (String) job.get("posicao");
-								String[] pos = st.split(",");
-								pos_atual[0] = Integer.parseInt(pos[0]);
-								pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));							
-							} 
-							else if(job.has("objetos")){
-								JSONArray ja = job.getJSONArray("objetos");
-								((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
-							}							
-						}						
+							for (int i = 0; i< res.length; i++){
+								JSONObject job = new JSONObject(res[i]);
+								
+								if ( job.has("id") ) {
+									if(this.id == 0) {
+										this.id = (Integer) job.get("id");
+									}								
+								} else if ( job.has("posicao") ) {
+									
+									String st = (String) job.get("posicao");
+									String[] pos = st.split(",");
+									pos_atual[0] = Integer.parseInt(pos[0]);
+									pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));
+									
+								} else if ( job.has("objetos") ) {
+									
+									JSONArray ja = job.getJSONArray("objetos");
+									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
+									
+								}
+							}						
+						}
+					
 					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				}
-				}
-				
+				}				
 			}
-		} catch (UnknownHostException e) {
-			Log.e("ERROR", e.toString());
-		} catch (IOException e) {
-			Log.e("ERROR", e.toString());
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 		
 	}
@@ -110,10 +111,9 @@ public class ClienteTCP implements Runnable {
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.flush();
-			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna+"\n");
+			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
 			os.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -121,30 +121,25 @@ public class ClienteTCP implements Runnable {
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair:"+id);
+			os.writeBytes("sair:" + id + "\n");
 			os.flush();
-
+			
 			sock.setKeepAlive(false);
 			sock.close();
-		} catch (IOException e) {
-			Log.e("ERROR", e.toString());
-		}
-		if(sock.isClosed()){
-			((Activity) context).runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
-				}
-			});
 			
+			if ( sock.isClosed() ) {
+				((Activity) context).runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	}
-	
-	/*public void setListener(EventListener eventListener){
-		this.listener=eventListener;
-	}*/
-	
+	}	
 	
 
 }
