@@ -123,7 +123,6 @@ func RetornarTabuleiro() string {
 						retorno += "\"id\" : " + strconv.Itoa(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].id) + ","
 						retorno += "\"tipoObj\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_obj + ","
 						retorno += "\"tipoJog\" : " + _tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog
-						fmt.Print(_tabuleiro.objetos[strconv.Itoa(i)+","+strconv.Itoa(j)].tipo_jog)
 						
 
 			if i == 4 && j == 4 {
