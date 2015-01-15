@@ -19,6 +19,8 @@ public class GameActivity extends Activity {
 		private ImageButton ib_up, ib_right, ib_down, ib_left;
 		//private int[] Globals.cliente.pos_atual;
 		private int tipo,acao;
+
+		private JSONArray ultimo_tabuleiro;
 		// Tipos de jogadores
 		private static final int PLANTADOR = 1;
 		private static final int LENHADOR = 2;
@@ -190,6 +192,7 @@ public class GameActivity extends Activity {
 
 				
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
+			this.ultimo_tabuleiro = dados;
 			runOnUiThread(new Runnable() {
 				
 				@Override
