@@ -205,12 +205,14 @@ public class GameActivity extends Activity {
 					int count = 0;					
 					int obj = 0;
 					int jog = 0;
+					int id = 0;
 					for (int x = 0; x < 5; x++) {
 						for (int y = 0; y < 5; y++) { 
 							
 							try {
 								obj = dados.getJSONObject(count).getInt("tipoObj");
 								jog = dados.getJSONObject(count).getInt("tipoJog");
+								id = dados.getJSONObject(count).getInt("id");
 							} catch (JSONException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -246,10 +248,16 @@ public class GameActivity extends Activity {
 							
 							switch (jog) {
 								case PLANTADOR:
-									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);				
+									if(id == Globals.cliente.id)
+										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);
+									else
+										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant_outro);
 									break;
 								case LENHADOR:
-									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);				
+									if(id == Globals.cliente.id)
+										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);	
+									else
+										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh_outro);
 									break;
 								default:
 									break;
