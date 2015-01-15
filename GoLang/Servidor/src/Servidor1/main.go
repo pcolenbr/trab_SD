@@ -212,7 +212,7 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 
 }
 
-func Plantar(id string, pos string) string {
+func Plantar(id string, pos string) bool {
 
 	pos = strings.TrimSpace(pos)
 
@@ -222,10 +222,10 @@ func Plantar(id string, pos string) string {
 	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
 
-		return "'plantar' : true"
+		return true
 	}
 
-	return "'plantar' : false"
+	return false
 
 }
 
@@ -352,11 +352,12 @@ func HandleRequest(conn net.Conn) {
 				pos := cmd[2]
 	
 				fmt.Println("Plantar")
-				Plantar(id, pos)
-				tab := RetornarTabuleiro()
-				b := []byte(tab)
-	
-				broadcast(b)
+				if(Plantar(id, pos)){
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+		
+					broadcast(b)
+				}
 	
 			} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -415,11 +416,12 @@ func HandleRequest(conn net.Conn) {
 			pos := cmd[2]
 	
 			fmt.Println("Plantar")
-			plantar := Plantar(id, pos)
-			tab := RetornarTabuleiro()
-			b := []byte(plantar + ";" + tab)
+			if(Plantar(id, pos)){
+				tab := RetornarTabuleiro()
+				b := []byte(tab)
 	
-			broadcast(b)
+				broadcast(b)
+			}
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
