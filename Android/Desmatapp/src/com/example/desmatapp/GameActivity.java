@@ -1,5 +1,7 @@
 package com.example.desmatapp;
 
+import java.util.Calendar;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -45,6 +47,7 @@ public class GameActivity extends Activity {
 	            tipo = extras.getInt("tipo_jogador");
 	        }
 	        SetComponents();
+			new Thread(Globals.cliente).start();
 	    }
 
 		private void SetComponents() {
@@ -148,7 +151,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if(Globals.cliente.pos_atual[0]>=1)
-						Globals.cliente.MoverJogador(Globals.cliente.id,Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
 					
 				}
 			});
@@ -157,7 +160,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if(Globals.cliente.pos_atual[1]<=3)
-						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
+						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
 				}
 			});
 			ib_down = (ImageButton) findViewById(R.id.ib_down);
@@ -165,7 +168,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if(Globals.cliente.pos_atual[0]<=3)
-						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
+						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
 				}
 			});
 			ib_left = (ImageButton) findViewById(R.id.ib_left);
@@ -173,7 +176,7 @@ public class GameActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					if(Globals.cliente.pos_atual[1]>=1)
-						Globals.cliente.MoverJogador(Globals.cliente.id, Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
+						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
 					
 				}
 			});

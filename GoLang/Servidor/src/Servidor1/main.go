@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.0.140"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -145,7 +145,7 @@ func broadcast(dados []byte) {
 		_,err := _listadejogadores.jogadores[i].conexao.Write(dados)
 		if err != nil {
 			//TODO Finalizar e remover a conexao/jogador da lista e do tabuleiro
-			fmt.Println("Broadcast - Erro:", err.Error())
+			fmt.Println("Erro:", err.Error())
 		}
 	}
 	
@@ -214,16 +214,8 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 
 func Plantar(id string, pos string) string {
 
-	fmt.Println(pos)
-	pos = strings.TrimSpace(pos)
-	
-	fmt.Println(pos)
-	
 	linha := strings.Split(pos, ",")
 	coluna := strings.Split(pos, ",")
-	
-	fmt.Println("Linha:" + linha[0])
-	fmt.Println("Coluna:" + coluna[0])
 
 	if strings.EqualFold(_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj, VAZIO) {
 		_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj = ARVORE
@@ -249,7 +241,7 @@ func Cortar(id string, pos string) string {
 	return "'cortar' : false"
 }
 
-func removerJogador(id string, posAtual string) bool {
+func removerJogador(id string) bool {
 	
 	ident, err := strconv.Atoi(id)
 	if err != nil {
@@ -257,11 +249,7 @@ func removerJogador(id string, posAtual string) bool {
 		return false
 	}
 	
-	linha := strings.Split(posAtual, ",")
-	coluna := strings.Split(posAtual, ",")
-	
-	_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_jog = VAZIO
-	
+	_listadejogadores.jogadores[ident].conexao.Close()
 	delete(_listadejogadores.jogadores, ident)
 	fmt.Println("Jogador removido da lista")
 	
@@ -298,12 +286,13 @@ func main() {
 			}(conn)
 		}
 		// Handle connections in a new goroutine.
-		
 	}
 }
 
 
 func HandleRequest(conn net.Conn) {
+	
+	log.Printf("Aqui")
 	
 	buf := make([]byte, 1024)
 	keep := true
@@ -356,14 +345,13 @@ func HandleRequest(conn net.Conn) {
 			} else if strings.EqualFold(cmd[0], string("plantar")) {
 	
 				id := cmd[1]
-				pos := strings.TrimSpace(cmd[2])
+				pos := cmd[2]
 	
-				fmt.Println("Plantar")	
 				plantar := Plantar(id, pos)
 				tab := RetornarTabuleiro()
 				b := []byte(plantar + ";" + tab)
-		
-				broadcast(b)
+	
+				conn.Write(b)
 	
 			} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -378,10 +366,18 @@ func HandleRequest(conn net.Conn) {
 			} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 				fmt.Println("Sair")
-				id := cmd[1]
-				posAtual := strings.TrimSpace(cmd[2])
-				removerJogador(id, posAtual)
-				keep = false;
+				id := strings.TrimSpace(cmd[1])
+				removerJogador(id)
+	
+			} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
+				
+				fmt.Println("Pedido de Tabuleiro")
+				id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
+				if err == nil {
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+					_listadejogadores.jogadores[id].conexao.Write(b)
+				}
 			}
 		}
 
@@ -411,14 +407,13 @@ func HandleRequest(conn net.Conn) {
 		} else if strings.EqualFold(cmd[0], string("plantar")) {
 	
 			id := cmd[1]
-			pos := strings.TrimSpace(cmd[2])
+			pos := cmd[2]
 	
-			fmt.Println("Plantar")
 			plantar := Plantar(id, pos)
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
 	
-			broadcast(b)
+			conn.Write(b)
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -433,10 +428,9 @@ func HandleRequest(conn net.Conn) {
 		} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 			fmt.Println("Sair")
-			id := cmd[1]
-			posAtual := strings.TrimSpace(cmd[2])
-			removerJogador(id, posAtual)
-			keep = false;
+			id := strings.TrimSpace(cmd[1])
+			removerJogador(id)
+			conn.Close()
 		}
 	}
 }

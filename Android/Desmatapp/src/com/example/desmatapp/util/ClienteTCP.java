@@ -4,14 +4,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
+import java.util.Calendar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -24,6 +23,8 @@ public class ClienteTCP implements Runnable {
 	private Context context;
 	private Socket sock;
 	private int tipo;
+	private int inicio;
+	private Calendar c;
 	public int[] pos_atual;
 	public int id;
 	public ImageView[][] tabuleiro;
@@ -50,6 +51,7 @@ public class ClienteTCP implements Runnable {
 	@Override
 	public void run() {
 		try {
+			this.id = 0;
 			sock = new Socket(ip, porta);
 			if(sock.isConnected()){		
 				((Activity) context).runOnUiThread(new Runnable() {
@@ -61,9 +63,10 @@ public class ClienteTCP implements Runnable {
 				});
 				 
 				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-				os.writeBytes("iniciarJogador:" + tipo+"\n");
-				
+				os.writeBytes("iniciarJogador:" + tipo+"\n");				
 				os.flush();
+				c = Calendar.getInstance(); 
+		        inicio = c.get(Calendar.SECOND);
 				while ( !sock.isClosed() ) {
 					if(sock.isConnected()) {
 						final byte[] data = new byte[2048];
@@ -92,12 +95,16 @@ public class ClienteTCP implements Runnable {
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 									
-								} else if ( job.has("plantar") ) {
-									//TODO calcular pontos?
 								}
 							}						
 						}
 					
+					}
+					if(id==0){
+						if(c.get(Calendar.SECOND) == (inicio+10)){
+							Globals.cliente.PedirTabuleiro();
+							inicio = c.get(Calendar.SECOND);
+						}
 					}
 				}				
 			}
@@ -108,24 +115,25 @@ public class ClienteTCP implements Runnable {
 		
 	}
 	
-	public void MoverJogador(int id, String posAtual, String posDesejada){
+	public void PedirTabuleiro(){
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.flush();
-			os.writeBytes("moverJogador:" + id + ":" + posAtual + ":" + posDesejada + "\n");
+			os.writeBytes("tabuleiro:" + id + "\n");
 			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
-	public void Plantar(int id, String pos) {
+	public void MoverJogador(String var_linha, String var_coluna){
 		DataOutputStream os;
 		try {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.flush();
-			os.writeBytes("plantar:" + id + ":" + pos + "\n");
+			os.writeBytes("moverJogador:" + id + ":" + var_linha+ ":" + var_coluna + "\n");
 			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -135,7 +143,7 @@ public class ClienteTCP implements Runnable {
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair:" + id + ":" + pos_atual[0] + "," + pos_atual[1] + "\n");
+			os.writeBytes("sair:" + id + "\n");
 			os.flush();
 			
 			sock.setKeepAlive(false);
