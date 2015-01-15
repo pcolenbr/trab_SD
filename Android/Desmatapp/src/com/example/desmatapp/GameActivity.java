@@ -88,7 +88,7 @@ public class GameActivity extends Activity {
 				bt_act3.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						Globals.cliente.Plantar(Globals.cliente.id, Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);
+						Globals.cliente.Plantar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);
 					}
 				});
 				

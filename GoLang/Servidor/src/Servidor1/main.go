@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "192.168.0.140"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -347,6 +347,7 @@ func HandleRequest(conn net.Conn) {
 				id := cmd[1]
 				pos := cmd[2]
 	
+				fmt.Println("Plantar")
 				plantar := Plantar(id, pos)
 				tab := RetornarTabuleiro()
 				b := []byte(plantar + ";" + tab)
@@ -409,6 +410,7 @@ func HandleRequest(conn net.Conn) {
 			id := cmd[1]
 			pos := cmd[2]
 	
+			fmt.Println("Plantar")
 			plantar := Plantar(id, pos)
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
