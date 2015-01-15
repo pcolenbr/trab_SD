@@ -64,36 +64,45 @@ public class ClienteTCP implements Runnable {
 				os.writeBytes("iniciarJogador:" + tipo+"\n");
 				
 				os.flush();
-				while(sock.isConnected()){	
-				final byte[] data = new byte[2048];
-				try {
-					InputStream is = sock.getInputStream();
-					int size = is.read(data);
-					if(size>0){
-						final String s = new String(data);
-						String[] res = s.split(";");
-						
-						for (int i = 0; i< res.length; i++){
-							JSONObject job = new JSONObject(res[i]);
+				while(!sock.isClosed()){	
+				if(sock.isConnected()){
+					final byte[] data = new byte[2048];
+					try {
+						InputStream is = sock.getInputStream();
+						int size = is.read(data);
+						if(size>0){
+							final String s = new String(data);
+							String[] res = s.split(";");
 							
-							if (job.has("id")){
-								this.id = (Integer) job.get("id");									
-							}else if(job.has("posicao")){
-								String st = (String) job.get("posicao");
-								String[] pos = st.split(",");
-								pos_atual[0] = Integer.parseInt(pos[0]);
-								pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));							
-							} 
-							else if(job.has("objetos")){
-								JSONArray ja = job.getJSONArray("objetos");
-								((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
-							}							
-						}						
+							for (int i = 0; i< res.length; i++){
+								JSONObject job = new JSONObject(res[i]);
+								
+								if (job.has("id")){
+									this.id = (Integer) job.get("id");									
+								}else if(job.has("posicao")){
+									String st = (String) job.get("posicao");
+									String[] pos = st.split(",");
+									pos_atual[0] = Integer.parseInt(pos[0]);
+									pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));							
+								} 
+								else if(job.has("objetos")){
+									JSONArray ja = job.getJSONArray("objetos");
+									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
+								}							
+							}						
+						}
+					}catch (Exception e) {
+						((Activity) context).runOnUiThread(new Runnable() {
+							
+							@Override
+							public void run() {
+								((Activity) context).finish();
+								FecharConexao();
+							}
+						});
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				}
+				} 
 				}
 				
 			}

@@ -140,10 +140,13 @@ func RetornarTabuleiro() string {
 }
 
 func broadcast(dados []byte) {
-	
 	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
-		_listadejogadores.jogadores[i].conexao.Write(dados)
+		_,err := _listadejogadores.jogadores[i].conexao.Write(dados)
+		if err != nil{
+			fmt.Println(err.Error())
+		}
 	}
+	
 	
 }
 
@@ -305,8 +308,7 @@ for (keep){
 			tab := RetornarTabuleiro()
 			
 			b := []byte(id + ";" +tab)
-
-			//conn.Write(b)
+			
 			broadcast(b)
 
 		}
