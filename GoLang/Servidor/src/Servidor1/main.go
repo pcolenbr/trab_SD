@@ -214,11 +214,13 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 
 func Plantar(id string, pos string) string {
 
-	linha := strings.Split(pos, ",")
-	coluna := strings.Split(pos, ",")
+	pos = strings.TrimSpace(pos)
 
-	if strings.EqualFold(_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj, VAZIO) {
-		_tabuleiro.objetos[linha[0]+","+coluna[0]].tipo_obj = ARVORE
+	posicao := strings.Split(pos, ",")
+	
+
+	if strings.EqualFold(_tabuleiro.objetos[posicao[0] + "," + posicao[1]].tipo_obj, VAZIO) {
+		_tabuleiro.objetos[posicao[0] + "," + posicao[1]].tipo_obj = ARVORE
 
 		return "'plantar' : true"
 	}
@@ -352,7 +354,7 @@ func HandleRequest(conn net.Conn) {
 				tab := RetornarTabuleiro()
 				b := []byte(plantar + ";" + tab)
 	
-				conn.Write(b)
+				broadcast(b)
 	
 			} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
@@ -415,7 +417,7 @@ func HandleRequest(conn net.Conn) {
 			tab := RetornarTabuleiro()
 			b := []byte(plantar + ";" + tab)
 	
-			conn.Write(b)
+			broadcast(b)
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
