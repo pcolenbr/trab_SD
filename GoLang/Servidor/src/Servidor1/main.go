@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.0.140"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -369,6 +369,15 @@ func HandleRequest(conn net.Conn) {
 				id := strings.TrimSpace(cmd[1])
 				removerJogador(id)
 	
+			} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
+				
+				fmt.Println("Pedido de Tabuleiro")
+				id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
+				if err == nil {
+					tab := RetornarTabuleiro()
+					b := []byte(tab)
+					_listadejogadores.jogadores[id].conexao.Write(b)
+				}
 			}
 		}
 
