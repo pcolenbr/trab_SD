@@ -80,14 +80,14 @@ public class ClienteTCP implements Runnable {
 								
 								if ( job.has("id") ) {
 									if(this.id == 0) {
-										this.id = (Integer) job.get("id");
+										this.id =job.getInt("id");
 									}
 								}  else if ( job.has("objetos") ) {
 									
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 									
-								}
+								} 
 							}						
 						}
 					
@@ -162,6 +162,18 @@ public class ClienteTCP implements Runnable {
 			os = new DataOutputStream(sock.getOutputStream());
 			os.flush();
 			os.writeBytes("cerca:" + id + ":" + pos + "\n");
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void Destruir(String pos){
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("destruir:" + id + ":" + pos + "\n");
 			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.0.140"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -140,9 +140,8 @@ func RetornarTabuleiro() string {
 }
 
 func broadcast(dados []byte) {
-	
-	for i := 1; i <= len(_listadejogadores.jogadores); i++ {
-		_,err := _listadejogadores.jogadores[i].conexao.Write(dados)
+		for _,jog := range (_listadejogadores.jogadores){
+		_,err := jog.conexao.Write(dados)
 		if err != nil {
 			//TODO Finalizar e remover a conexao/jogador da lista e do tabuleiro
 			fmt.Println("Erro:", err.Error())
@@ -194,18 +193,21 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 	posAtual = strings.TrimSpace(posAtual)
 	posicaoAtual := strings.Split(posAtual, ",")
 	posicaoAtual[1] = strings.TrimSpace(posicaoAtual[1])
-	posAtual = strings.TrimSpace(posDesejada)
+	posDesejada = strings.TrimSpace(posDesejada)
 	posicaoDesejada := strings.Split(posDesejada, ",")
 	posicaoDesejada[1] = strings.TrimSpace(posicaoDesejada[1])
 	
 	if(_listadejogadores.jogadores[ident].tipo == LENHADOR){
 		if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) &&
-		!strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_obj, CERCA) {
+		!strings.EqualFold(_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_obj, CERCA) {
 			_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
 			_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
 			
 			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+			
+			_listadejogadores.jogadores[ident].pos_linha = posicaoDesejada[0]
+			_listadejogadores.jogadores[ident].pos_coluna = posicaoDesejada[1]
 			
 			return "{\"posicao\": \"" + posDesejada + "\"}"
 		}
@@ -217,6 +219,9 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 				
 				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+				
+				_listadejogadores.jogadores[ident].pos_linha = posicaoDesejada[0]
+				_listadejogadores.jogadores[ident].pos_coluna = posicaoDesejada[1]
 				
 				return "{\"posicao\": \"" + posDesejada + "\"}"
 		}
@@ -274,6 +279,23 @@ func Cerca (id string, pos string) bool {
 	}
 
 	return false
+
+}
+
+func Destruir (id string, pos string) string {
+
+	pos = strings.TrimSpace(pos)
+
+	posicao := strings.Split(pos, ",")
+	
+
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, CERCA) {
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
+
+		return "{\"destruido\": \"true\"}"
+	}
+
+	return "{\"destruido\": \"false\"}"
 
 }
 
@@ -417,11 +439,26 @@ func HandleRequest(conn net.Conn) {
 					broadcast(b)
 				}
 	
+			} else if strings.EqualFold(cmd[0], string("destruir")) {
+	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				destruir := Destruir( id, pos )
+				tab := RetornarTabuleiro()
+				b := []byte( destruir + ";" + tab )
+	
+				broadcast(b)
+	
 			} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 				fmt.Println("Sair")
 				id := strings.TrimSpace(cmd[1])
-				removerJogador(id)
+				if(removerJogador(id)){
+					tab := RetornarTabuleiro()
+					b :=[]byte(tab)	
+					broadcast(b)
+				}
 	
 			} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
 				
@@ -495,7 +532,18 @@ func HandleRequest(conn net.Conn) {
 				broadcast(b)
 			}
 
-		} else if strings.EqualFold(cmd[0], string("sair")) {
+		} else if strings.EqualFold(cmd[0], string("destruir")) {
+	
+				id := cmd[1]
+				pos := cmd[2]
+	
+				destruir := Destruir( id, pos )
+				tab := RetornarTabuleiro()
+				b := []byte( destruir + ";" + tab )
+	
+				broadcast(b)
+	
+			} else if strings.EqualFold(cmd[0], string("sair")) {
 				
 			fmt.Println("Sair")
 			id := strings.TrimSpace(cmd[1])

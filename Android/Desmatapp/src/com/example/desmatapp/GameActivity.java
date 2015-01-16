@@ -8,11 +8,13 @@ import com.example.desmatapp.util.Globals;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 public class GameActivity extends Activity {
@@ -44,8 +46,11 @@ public class GameActivity extends Activity {
 	            tipo = extras.getInt("tipo_jogador");
 	        }
 	        SetComponents();
+	        EnableButtons(false);
 			new Thread(Globals.cliente).start();
 	    }
+
+		
 
 		private void SetComponents() {
 			Globals.cliente.setContext(GameActivity.this);
@@ -53,7 +58,6 @@ public class GameActivity extends Activity {
 			bt_sair.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					//TODO Avisar ao servidor que o jogador saiu
 					Globals.cliente.FecharConexao();
 					finish();
 				}
@@ -76,14 +80,14 @@ public class GameActivity extends Activity {
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						Globals.cliente.Cerca( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);								
+						Globals.cliente.Cerca( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );								
 					}
 				});
 				bt_act3.setText(R.string.arv); 
 				bt_act3.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						Globals.cliente.Plantar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);
+						Globals.cliente.Plantar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 					}
 				});
 				
@@ -95,14 +99,21 @@ public class GameActivity extends Activity {
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						Globals.cliente.Cortar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1]);
+						Globals.cliente.Cortar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 					}
 				});
 				bt_act3.setText(R.string.dest);
 				bt_act3.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						// TODO Ação destruir	
+						EnableButtons(false);
+						Handler handler = new Handler();
+						handler.postDelayed(new Runnable() {
+						    public void run() {
+						    	Globals.cliente.Destruir( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
+						    }
+						}, 1000);
+						
 					}
 				});
 			}
@@ -178,21 +189,32 @@ public class GameActivity extends Activity {
 		}
 		
 		
+		private void EnableButtons(boolean botoes) {
+			bt_act1.setEnabled(botoes);
+			bt_act2.setEnabled(botoes);
+			bt_act3.setEnabled(botoes);
+			ib_down.setEnabled(botoes);
+			ib_left.setEnabled(botoes);
+			ib_right.setEnabled(botoes);
+			ib_up.setEnabled(botoes);
+			
+			if(botoes){
+				((ProgressBar) findViewById(R.id.pb_action)).setVisibility(View.INVISIBLE);
+			}
+			else{
+				((ProgressBar) findViewById(R.id.pb_action)).setVisibility(View.VISIBLE);
+			}
+			
+			
+		}
 
-
-		/*private int[] get_posicao() {
-			// TODO Inserir código para enviar requisição ao servidor
-			//Código abaixo somente para testes
-			return Globals.cliente.pos_atual;
-		}*/
-
-				
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
 			runOnUiThread(new Runnable() {
 				
 				@Override
 				public void run() {
 					((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
+					EnableButtons(true);
 					int count = 0;					
 					int obj = 0;
 					int jog = 0;
@@ -205,7 +227,6 @@ public class GameActivity extends Activity {
 								jog = dados.getJSONObject(count).getInt("tipoJog");
 								id = dados.getJSONObject(count).getInt("id");
 							} catch (JSONException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 							
@@ -219,7 +240,6 @@ public class GameActivity extends Activity {
 									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);	
 									break;
 								case DESTRUIR:
-									//TODO colocar um tempo
 									Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);
 									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.empty);
 									break;
