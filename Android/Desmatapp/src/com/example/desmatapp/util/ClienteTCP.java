@@ -51,7 +51,6 @@ public class ClienteTCP implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.id = 0;
 			sock = new Socket(ip, porta);
 			if(sock.isConnected()){		
 				((Activity) context).runOnUiThread(new Runnable() {
@@ -82,15 +81,8 @@ public class ClienteTCP implements Runnable {
 								if ( job.has("id") ) {
 									if(this.id == 0) {
 										this.id = (Integer) job.get("id");
-									}								
-								} else if ( job.has("posicao") ) {
-									
-									String st = (String) job.get("posicao");
-									String[] pos = st.split(",");
-									pos_atual[0] = Integer.parseInt(pos[0]);
-									pos_atual[1] = Integer.parseInt(pos[1].replaceAll("\\n", ""));
-									
-								} else if ( job.has("objetos") ) {
+									}
+								}  else if ( job.has("objetos") ) {
 									
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);

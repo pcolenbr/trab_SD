@@ -372,10 +372,10 @@ func HandleRequest(conn net.Conn) {
 				
 	
 				fmt.Println("Mover jogador")
-				pos := MoverJogador(id, posAtual, posDesejada)
+				MoverJogador(id, posAtual, posDesejada)
 				tab := RetornarTabuleiro()
 	
-				b :=[]byte(pos + ";" + tab)
+				b :=[]byte(tab)
 	
 				
 				broadcast(b)
@@ -451,10 +451,10 @@ func HandleRequest(conn net.Conn) {
 				
 	
 			fmt.Println("Mover jogador")
-			pos := MoverJogador(id, posAtual, posDesejada)
+			MoverJogador(id, posAtual, posDesejada)
 			tab := RetornarTabuleiro()
 	
-			b :=[]byte(pos + ";" + tab)
+			b :=[]byte(tab)
 				
 			broadcast(b)
 	

@@ -239,14 +239,20 @@ public class GameActivity extends Activity {
 							
 							switch (jog) {
 								case PLANTADOR:
-									if(id == Globals.cliente.id)
+									if(id == Globals.cliente.id){
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);
+										Globals.cliente.pos_atual[0] = x;
+										Globals.cliente.pos_atual[1] = y;
+									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant_outro);
 									break;
 								case LENHADOR:
-									if(id == Globals.cliente.id)
-										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);	
+									if(id == Globals.cliente.id){
+										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);
+										Globals.cliente.pos_atual[0] = x;
+										Globals.cliente.pos_atual[1] = y;	
+									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh_outro);
 									break;
