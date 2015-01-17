@@ -180,6 +180,18 @@ public class ClienteTCP implements Runnable {
 		}
 	}
 	
+	public void ArvoreMorrendo(String pos) {
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("morrendo:" + id + ":" + pos + "\n");
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void FecharConexao(){
 		try {
 			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
@@ -201,7 +213,9 @@ public class ClienteTCP implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+
+		
 	
 
 }

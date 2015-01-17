@@ -29,9 +29,13 @@ public class GameActivity extends Activity {
 		// Tipos de ações
 		private static final int PLANTAR = 10;
 		private static final int CERCA = 20;
-		private static final int REGAR = 30;
-		private static final int CORTAR = 40;
-		private static final int DESTRUIR = 50;
+		private static final int MORRENDO = 30;
+		private static final int REGAR = 40;
+		private static final int CORTAR = 50;
+		private static final int DESTRUIR = 60;
+		// Tempos do jogo
+		private static final int ARVORE_DESIDRATADA = 10000;
+		
 		
 		
 		
@@ -72,8 +76,8 @@ public class GameActivity extends Activity {
 				bt_act1.setText(R.string.reg);
 				bt_act1.setOnClickListener(new OnClickListener() {
 					@Override
-					public void onClick(View v) {
-						// TODO Ação regar				
+					public void onClick(View v) {	
+						bt_act3.callOnClick();
 					}
 				});
 				bt_act2.setText(R.string.cerc);
@@ -87,7 +91,20 @@ public class GameActivity extends Activity {
 				bt_act3.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
-						Globals.cliente.Plantar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
+						final String pos = Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1];
+						Globals.cliente.Plantar( pos );
+						Handler handler = new Handler();
+						handler.postDelayed(new Runnable() {
+						    public void run() {
+						    	Globals.cliente.ArvoreMorrendo( pos );
+						    	Handler handler2 = new Handler();
+								handler2.postDelayed(new Runnable() {
+								    public void run() {
+								    	Globals.cliente.Cortar( pos );
+								    }
+								}, ARVORE_DESIDRATADA);
+						    }
+						}, ARVORE_DESIDRATADA);
 					}
 				});
 				
@@ -112,8 +129,7 @@ public class GameActivity extends Activity {
 						    public void run() {
 						    	Globals.cliente.Destruir( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 						    }
-						}, 1000);
-						
+						}, 1000);						
 					}
 				});
 			}
@@ -250,6 +266,10 @@ public class GameActivity extends Activity {
 								case REGAR:
 									Globals.cliente.tabuleiro[x][y].setTag(R.drawable.tree);
 									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.tree);
+									break;
+								case MORRENDO:
+									Globals.cliente.tabuleiro[x][y].setTag(R.drawable.dtree);
+									Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.dtree);
 									break;
 								default:
 									Globals.cliente.tabuleiro[x][y].setTag(R.drawable.empty);

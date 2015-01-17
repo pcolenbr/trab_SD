@@ -238,7 +238,9 @@ func Plantar(id string, pos string) bool {
 	posicao := strings.Split(pos, ",")
 	
 
-	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) ||
+	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) ||
+	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
 
 		return true
@@ -249,14 +251,25 @@ func Plantar(id string, pos string) bool {
 }
 
 func Cortar (id string, pos string) bool {
-
+	ident, err := strconv.Atoi(id)
+	if err != nil {
+		fmt.Println("Erro:", err.Error())
+		return false
+	}
 	pos = strings.TrimSpace(pos)
 
 	posicao := strings.Split(pos, ",")
 	
 
-	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) {
+	if strings.EqualFold(_listadejogadores.jogadores[ident].tipo,LENHADOR) && 
+	(strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) ||
+	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M)) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
+
+		return true
+	} else if strings.EqualFold(_listadejogadores.jogadores[ident].tipo, PLANTADOR) && 
+		   strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
+				_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
 
 		return true
 	}
@@ -296,6 +309,26 @@ func Destruir (id string, pos string) string {
 	}
 
 	return "{\"destruido\": \"false\"}"
+
+}
+
+func Morrendo (id string, pos string) string {
+
+	pos = strings.TrimSpace(pos)
+
+	posicao := strings.Split(pos, ",")
+	
+	fmt.Println("Morrendo")
+
+	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) {
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE_M
+
+		fmt.Println("Setado Morrendo")
+		
+		return "{\"morrendo\": \"true\"}"
+	}
+
+	return "{\"morrendo\": \"false\"}"
 
 }
 
@@ -351,9 +384,6 @@ func main() {
 
 
 func HandleRequest(conn net.Conn) {
-	
-	log.Printf("Aqui")
-	
 	buf := make([]byte, 1024)
 	keep := true
 
@@ -420,6 +450,7 @@ func HandleRequest(conn net.Conn) {
 				id := cmd[1]
 				pos := cmd[2]
 	
+				fmt.Println("Cortar")
 				if(Cortar(id, pos)){
 					tab := RetornarTabuleiro()
 					b := []byte(tab)
@@ -432,6 +463,7 @@ func HandleRequest(conn net.Conn) {
 				id := cmd[1]
 				pos := cmd[2]
 	
+				fmt.Println("Cerca")
 				if(Cerca(id, pos)){
 					tab := RetornarTabuleiro()
 					b := []byte(tab)
@@ -444,9 +476,26 @@ func HandleRequest(conn net.Conn) {
 				id := cmd[1]
 				pos := cmd[2]
 	
+				fmt.Println("Destruir")
 				destruir := Destruir( id, pos )
 				tab := RetornarTabuleiro()
 				b := []byte( destruir + ";" + tab )
+	
+				broadcast(b)
+	
+			} else if strings.EqualFold(cmd[0], string("morrendo")) {
+				
+				fmt.Println("CMD: Morrendo")
+	
+				id := cmd[1]
+				fmt.Println("CMD: ID Morrendo")
+				pos := cmd[2]
+				fmt.Println("CMD: POS Morrendo")
+	
+				fmt.Println("Morrendo")
+				Morrendo( id, pos )
+				tab := RetornarTabuleiro()
+				b := []byte( tab )
 	
 				broadcast(b)
 	
@@ -510,15 +559,15 @@ func HandleRequest(conn net.Conn) {
 	
 		} else if strings.EqualFold(cmd[0], string("cortar")) {
 	
-				id := cmd[1]
-				pos := cmd[2]
+			id := cmd[1]
+			pos := cmd[2]
+
+			if(Cortar(id, pos)){
+				tab := RetornarTabuleiro()
+				b := []byte(tab)
 	
-				if(Cortar(id, pos)){
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-		
-					broadcast(b)
-				}
+				broadcast(b)
+			}
 	
 		} else if strings.EqualFold(cmd[0], string("cerca")) {
 	
@@ -534,17 +583,33 @@ func HandleRequest(conn net.Conn) {
 
 		} else if strings.EqualFold(cmd[0], string("destruir")) {
 	
-				id := cmd[1]
-				pos := cmd[2]
+			id := cmd[1]
+			pos := cmd[2]
+
+			destruir := Destruir( id, pos )
+			tab := RetornarTabuleiro()
+			b := []byte( destruir + ";" + tab )
+
+			broadcast(b)
 	
-				destruir := Destruir( id, pos )
-				tab := RetornarTabuleiro()
-				b := []byte( destruir + ";" + tab )
-	
-				broadcast(b)
-	
-			} else if strings.EqualFold(cmd[0], string("sair")) {
-				
+		} else if strings.EqualFold(cmd[0], string("morrendo")) {
+			
+			fmt.Println("CMD: Morrendo")
+
+			id := cmd[1]
+			fmt.Println("CMD: ID Morrendo")
+			pos := cmd[2]
+			fmt.Println("CMD: POS Morrendo")
+
+			fmt.Println("Morrendo")
+			Morrendo( id, pos )
+			tab := RetornarTabuleiro()
+			b := []byte( tab )
+
+			broadcast(b)
+
+		} else if strings.EqualFold(cmd[0], string("sair")) {
+			
 			fmt.Println("Sair")
 			id := strings.TrimSpace(cmd[1])
 			if(removerJogador(id)){
