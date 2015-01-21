@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.56.101"
+	CONN_HOST    = "172.16.253.88"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -57,6 +57,7 @@ type ListaJogadores struct {
 
 type Objeto struct {
 	id         int
+	pontuacao  int
 	tipo_obj   string
 	tipo_jog   string
 	//tempo de tempo do posicionamento?
@@ -65,6 +66,7 @@ type Objeto struct {
 func NovoObjetoVazio() *Objeto {
 	objeto := &Objeto{
 		id:         0,
+		pontuacao:  0,
 		tipo_obj:   VAZIO,
 		tipo_jog:   VAZIO,
 	}
@@ -205,6 +207,8 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 			
 			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+			_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].pontuacao = _tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].pontuacao
+			_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].pontuacao = 0
 			
 			_listadejogadores.jogadores[ident].pos_linha = posicaoDesejada[0]
 			_listadejogadores.jogadores[ident].pos_coluna = posicaoDesejada[1]
@@ -212,13 +216,14 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 			return "{\"posicao\": \"" + posDesejada + "\"}"
 		}
 	} else {
-			if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) &&
-			!strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_obj, CERCA) {
+			if strings.EqualFold(_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog, VAZIO) {
 				_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].tipo_jog = VAZIO
 				_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].id = 0
 				
 				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].tipo_jog = _listadejogadores.jogadores[ident].tipo
 				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].id = ident
+				_tabuleiro.objetos[posicaoDesejada[0]+","+posicaoDesejada[1]].pontuacao = _tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].pontuacao
+				_tabuleiro.objetos[posicaoAtual[0]+","+posicaoAtual[1]].pontuacao = 0
 				
 				_listadejogadores.jogadores[ident].pos_linha = posicaoDesejada[0]
 				_listadejogadores.jogadores[ident].pos_coluna = posicaoDesejada[1]
@@ -232,9 +237,8 @@ func MoverJogador(id string, posAtual string, posDesejada string) string {
 }
 
 func Plantar(id string, pos string) bool {
-
+	
 	pos = strings.TrimSpace(pos)
-
 	posicao := strings.Split(pos, ",")
 	
 
@@ -242,7 +246,7 @@ func Plantar(id string, pos string) bool {
 	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) ||
 	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
-
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
 		return true
 	}
 
@@ -265,11 +269,13 @@ func Cortar (id string, pos string) bool {
 	(strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE) ||
 	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M)) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
 
 		return true
 	} else if strings.EqualFold(_listadejogadores.jogadores[ident].tipo, PLANTADOR) && 
 		   strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
 				_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
+				_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao -= 5
 
 		return true
 	}
@@ -279,14 +285,13 @@ func Cortar (id string, pos string) bool {
 }
 
 func Cerca (id string, pos string) bool {
-
 	pos = strings.TrimSpace(pos)
-
 	posicao := strings.Split(pos, ",")
 	
 
 	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = CERCA
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
 
 		return true
 	}
@@ -298,13 +303,12 @@ func Cerca (id string, pos string) bool {
 func Destruir (id string, pos string) string {
 
 	pos = strings.TrimSpace(pos)
-
 	posicao := strings.Split(pos, ",")
 	
 
 	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, CERCA) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
-
+		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 10
 		return "{\"destruido\": \"true\"}"
 	}
 

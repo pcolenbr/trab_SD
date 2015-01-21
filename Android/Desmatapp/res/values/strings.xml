@@ -25,5 +25,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="Aguar_Jog">Aguardando jogador</string>
     <string name="Info_serv">Obtendo informações do servidor</string>
+    <string name="Pontos">pts</string>
 
 </resources>

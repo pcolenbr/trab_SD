@@ -16,13 +16,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
+		private TextView tv_pts;
 		
 		private ImageButton ib_up, ib_right, ib_down, ib_left;
 		//private int[] Globals.cliente.pos_atual;
-		private int tipo;
+		private int tipo,pontuacao;
 		// Tipos de jogadores
 		private static final int PLANTADOR = 1;
 		private static final int LENHADOR = 2;
@@ -34,7 +36,7 @@ public class GameActivity extends Activity {
 		private static final int CORTAR = 50;
 		private static final int DESTRUIR = 60;
 		// Tempos do jogo
-		private static final int ARVORE_DESIDRATADA = 10000;
+		private static final int ARVORE_DESIDRATADA = 5000;
 		
 		
 		
@@ -58,6 +60,7 @@ public class GameActivity extends Activity {
 
 		private void SetComponents() {
 			Globals.cliente.setContext(GameActivity.this);
+			tv_pts = (TextView) findViewById(R.id.tv_pts);
 			bt_sair = (Button) findViewById(R.id.bt_sair);
 			bt_sair.setOnClickListener(new OnClickListener() {
 				@Override
@@ -235,6 +238,7 @@ public class GameActivity extends Activity {
 					int obj = 0;
 					int jog = 0;
 					int id = 0;
+					int pt = 0;
 					for (int x = 0; x < 5; x++) {
 						for (int y = 0; y < 5; y++) { 
 							
@@ -242,6 +246,7 @@ public class GameActivity extends Activity {
 								obj = dados.getJSONObject(count).getInt("tipoObj");
 								jog = dados.getJSONObject(count).getInt("tipoJog");
 								id = dados.getJSONObject(count).getInt("id");
+								pt = dados.getJSONObject(count).getInt("pontuacao");
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}
@@ -283,6 +288,8 @@ public class GameActivity extends Activity {
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant);
 										Globals.cliente.pos_atual[0] = x;
 										Globals.cliente.pos_atual[1] = y;
+										pontuacao = pt;
+										tv_pts.setText(pontuacao);
 									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant_outro);
@@ -292,6 +299,8 @@ public class GameActivity extends Activity {
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh);
 										Globals.cliente.pos_atual[0] = x;
 										Globals.cliente.pos_atual[1] = y;	
+										pontuacao = pt;
+										tv_pts.setText(pontuacao);
 									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh_outro);
