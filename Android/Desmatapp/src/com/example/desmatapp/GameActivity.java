@@ -289,7 +289,7 @@ public class GameActivity extends Activity {
 										Globals.cliente.pos_atual[0] = x;
 										Globals.cliente.pos_atual[1] = y;
 										pontuacao = pt;
-										tv_pts.setText(pontuacao);
+										tv_pts.setText(""+pontuacao);
 									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.plant_outro);
@@ -300,7 +300,7 @@ public class GameActivity extends Activity {
 										Globals.cliente.pos_atual[0] = x;
 										Globals.cliente.pos_atual[1] = y;	
 										pontuacao = pt;
-										tv_pts.setText(pontuacao);
+										tv_pts.setText(""+pontuacao);
 									}
 									else
 										Globals.cliente.tabuleiro[x][y].setImageResource(R.drawable.lenh_outro);
