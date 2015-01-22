@@ -546,7 +546,11 @@ func whatToDo(cmd []string) {
 		id := strings.TrimSpace(cmd[1])
 		if(removerJogador(id)){
 			tab := RetornarTabuleiro()
-			b :=[]byte(tab)	
+			semJogador := "{'semJogador' : false}"
+			if (len(_listadejogadores.jogadores) >= MINJOGADORES) {
+				semJogador = "{'semJogador' : true}"
+			}
+			b := []byte(semJogador + ";" + tab)
 			broadcast(b)
 		}
 	} else if strings.EqualFold(cmd[0], string("tabuleiro")) {

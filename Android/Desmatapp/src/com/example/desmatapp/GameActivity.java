@@ -260,7 +260,24 @@ public class GameActivity extends Activity {
 					}
 				});
 			}
+			else{
+				runOnUiThread(new Runnable() {
+				
+					@Override
+					public void run() {
+						((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.VISIBLE);
+						EnableButtons(false);
+					}
+				});				
+			}
 			start_game = startGame;
+		}
+		
+		public void faltaJogador(boolean endGame) {
+			Intent intent = new Intent(GameActivity.this, MainActivity.class);
+			startActivity(intent);
+			Globals.cliente.FecharConexao(3);
+			
 		}
 		
 		public void salaCheia() {
@@ -367,4 +384,8 @@ public class GameActivity extends Activity {
 						
 			
 		}
+
+
+
+		
 }

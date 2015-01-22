@@ -30,6 +30,8 @@ public class ClienteTCP implements Runnable {
 	public ImageView[][] tabuleiro;
 	
 	public boolean startGame;
+	private boolean endGame;
+	private boolean semJogador;
 
 	public ClienteTCP(String ip, int porta, int tipo) {
 
@@ -95,6 +97,9 @@ public class ClienteTCP implements Runnable {
 								}  else if ( job.has("startGame") ) {
 									this.startGame = job.getBoolean("startGame");
 									((GameActivity) ((Activity)context)).iniciarJogo(this.startGame);;
+								} else if ( job.has("semJogador") ) {
+									this.semJogador = job.getBoolean("semJogador");
+									((GameActivity) ((Activity)context)).faltaJogador(this.semJogador);;
 								} else if ( job.has("salaCheia") ) {
 									if (job.getBoolean("salaCheia")) {
 										((GameActivity) ((Activity)context)).salaCheia();
@@ -238,6 +243,26 @@ public class ClienteTCP implements Runnable {
 						@Override
 						public void run() {
 							Toast.makeText(context, "Sala Cheia", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if (op == 3) {
+			try {
+				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
+				os.writeBytes("sair:" + id + "\n");
+				os.flush();
+				sock.setKeepAlive(false);
+				sock.close();
+				
+				if ( sock.isClosed() ) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(context, "Os outros jogadores abandonaram o jogo", Toast.LENGTH_SHORT).show();
 						}
 					});
 				}
