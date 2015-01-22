@@ -494,24 +494,22 @@ func whatToDo(cmd []string) {
 		id := cmd[1]
 		pos := cmd[2]
 
-		if(Cortar(id, pos)){
-			tab := RetornarTabuleiro()
-			b := []byte(tab)
-	
-			broadcast(b)
-		}
+		Cortar(id, pos)
+		tab := RetornarTabuleiro()
+		b := []byte(tab)
+
+		broadcast(b)
 	
 	} else if strings.EqualFold(cmd[0], string("cerca")) {
 	
 		id := cmd[1]
 		pos := cmd[2]
 
-		if(Cerca(id, pos)){
-			tab := RetornarTabuleiro()
-			b := []byte(tab)
-	
-			broadcast(b)
-		}
+		Cerca(id, pos)
+		tab := RetornarTabuleiro()
+		b := []byte(tab)
+
+		broadcast(b)
 
 	} else if strings.EqualFold(cmd[0], string("destruir")) {
 	
