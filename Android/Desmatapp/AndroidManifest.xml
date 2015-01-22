@@ -30,7 +30,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_game"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/FullscreenTheme" >
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.desmatapp.MainActivity" />

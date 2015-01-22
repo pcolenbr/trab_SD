@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
@@ -37,6 +38,8 @@ public class GameActivity extends Activity {
 		private static final int DESTRUIR = 60;
 		// Tempos do jogo
 		private static final int ARVORE_DESIDRATADA = 5000;
+		private long t_ini, t_fim;
+		private boolean req;
 		
 		
 		
@@ -62,6 +65,7 @@ public class GameActivity extends Activity {
 			Globals.cliente.setContext(GameActivity.this);
 			tv_pts = (TextView) findViewById(R.id.tv_pts);
 			bt_sair = (Button) findViewById(R.id.bt_sair);
+			req = false;
 			bt_sair.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -87,6 +91,8 @@ public class GameActivity extends Activity {
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.Cerca( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );								
 					}
 				});
@@ -95,6 +101,8 @@ public class GameActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						final String pos = Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1];
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.Plantar( pos );
 						Handler handler = new Handler();
 						handler.postDelayed(new Runnable() {
@@ -119,6 +127,8 @@ public class GameActivity extends Activity {
 				bt_act2.setOnClickListener(new OnClickListener() {					
 					@Override
 					public void onClick(View v) {
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.Cortar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 					}
 				});
@@ -130,6 +140,8 @@ public class GameActivity extends Activity {
 						Handler handler = new Handler();
 						handler.postDelayed(new Runnable() {
 						    public void run() {
+								t_ini = System.currentTimeMillis();
+								req = true;
 						    	Globals.cliente.Destruir( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 						    }
 						}, 1000);						
@@ -157,24 +169,15 @@ public class GameActivity extends Activity {
 			//--------- Fim Globals.cliente.tabuleiro ----------//
 			
 			//--------- Início movimentações ----------//
-			//Globals.cliente.pos_atual = get_posicao();
-			/*switch (tipo) {
-			case PLANTADOR:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.plant);				
-				break;
-			case LENHADOR:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.lenh);				
-				break;
-			default:
-				Globals.cliente.tabuleiro[Globals.cliente.pos_atual[0]][Globals.cliente.pos_atual[1]].setImageResource(R.drawable.empty);
-				break;
-			}*/
 			ib_up = (ImageButton) findViewById(R.id.ib_up);
 			ib_up.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					if(Globals.cliente.pos_atual[0]>=1)
+					if(Globals.cliente.pos_atual[0]>=1){
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
+					}
 					
 				}
 			});
@@ -182,24 +185,33 @@ public class GameActivity extends Activity {
 			ib_right.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					if(Globals.cliente.pos_atual[1]<=3)
+					if(Globals.cliente.pos_atual[1]<=3){
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
+					}
 				}
 			});
 			ib_down = (ImageButton) findViewById(R.id.ib_down);
 			ib_down.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					if(Globals.cliente.pos_atual[0]<=3)
+					if(Globals.cliente.pos_atual[0]<=3){
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
+					}
 				}
 			});
 			ib_left = (ImageButton) findViewById(R.id.ib_left);
 			ib_left.setOnClickListener(new OnClickListener() {				
 				@Override
 				public void onClick(View v) {
-					if(Globals.cliente.pos_atual[1]>=1)
+					if(Globals.cliente.pos_atual[1]>=1){
+						t_ini = System.currentTimeMillis();
+						req = true;
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
+					}
 					
 				}
 			});
@@ -234,6 +246,11 @@ public class GameActivity extends Activity {
 				public void run() {
 					((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
 					EnableButtons(true);
+					if(req){
+						t_fim = System.currentTimeMillis();
+						Toast.makeText(GameActivity.this, "Tempo de resposta: "+ (t_fim - t_ini) + "ms", Toast.LENGTH_SHORT).show();
+						req = false;
+					}
 					int count = 0;					
 					int obj = 0;
 					int jog = 0;
