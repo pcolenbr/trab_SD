@@ -28,6 +28,8 @@ public class ClienteTCP implements Runnable {
 	public int[] pos_atual;
 	public int id;
 	public ImageView[][] tabuleiro;
+	
+	public boolean startGame;
 
 	public ClienteTCP(String ip, int porta, int tipo) {
 
@@ -37,6 +39,8 @@ public class ClienteTCP implements Runnable {
 		this.tipo = tipo;
 		this.tabuleiro = new ImageView[5][5];
 		this.pos_atual = new int[2];
+		this.startGame = false;
+		
 	}
 	
 	public void setContext(Context context){
@@ -80,14 +84,17 @@ public class ClienteTCP implements Runnable {
 								
 								if ( job.has("id") ) {
 									if(this.id == 0) {
-										this.id =job.getInt("id");
+										this.id = job.getInt("id");
 									}
 								}  else if ( job.has("objetos") ) {
 									
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 									
-								} 
+								}  else if ( job.has("startGame") ) {
+									this.startGame = job.getBoolean("startGame");
+									((GameActivity) ((Activity)context)).iniciarJogo(this.startGame);;
+								}
 							}						
 						}
 					

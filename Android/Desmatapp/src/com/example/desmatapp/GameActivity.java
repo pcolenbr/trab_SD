@@ -226,13 +226,19 @@ public class GameActivity extends Activity {
 			
 			
 		}
+		
+		public void iniciarJogo(boolean startGame) {
+			if(startGame) {
+				((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
+			}
+		}
 
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {
 			runOnUiThread(new Runnable() {
 				
 				@Override
 				public void run() {
-					((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
+					//((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
 					EnableButtons(true);
 					int count = 0;					
 					int obj = 0;
