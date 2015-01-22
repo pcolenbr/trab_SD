@@ -94,7 +94,12 @@ public class ClienteTCP implements Runnable {
 								}  else if ( job.has("startGame") ) {
 									this.startGame = job.getBoolean("startGame");
 									((GameActivity) ((Activity)context)).iniciarJogo(this.startGame);;
+								} else if ( job.has("salaCheia") ) {
+									if (job.getBoolean("salaCheia")) {
+										((GameActivity) ((Activity)context)).salaCheia();
+									}
 								}
+								
 							}						
 						}
 					
@@ -199,27 +204,48 @@ public class ClienteTCP implements Runnable {
 		}
 	}
 	
-	public void FecharConexao(){
-		try {
-			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair:" + id + "\n");
-			os.flush();
-			
-			sock.setKeepAlive(false);
-			sock.close();
-			
-			if ( sock.isClosed() ) {
-				((Activity) context).runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
-					}
-				});
+	public void FecharConexao(int op){
+		if(op == 1) {
+			try {
+				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
+				os.writeBytes("sair:" + id + "\n");
+				os.flush();
+				
+				sock.setKeepAlive(false);
+				sock.close();
+				
+				if ( sock.isClosed() ) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else if (op == 2) {
+			try {
+				sock.setKeepAlive(false);
+				sock.close();
+				
+				if ( sock.isClosed() ) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(context, "Sala Cheia", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+		
+		
 	}
 
 		

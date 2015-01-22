@@ -4,9 +4,8 @@ package com.example.desmatapp;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.example.desmatapp.util.Globals;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -17,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.example.desmatapp.util.Globals;
 
 public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
@@ -65,7 +66,7 @@ public class GameActivity extends Activity {
 			bt_sair.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Globals.cliente.FecharConexao();
+					Globals.cliente.FecharConexao(1);
 					finish();
 				}
 			});			
@@ -231,6 +232,12 @@ public class GameActivity extends Activity {
 			if(startGame) {
 				((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
 			}
+		}
+		
+		public void salaCheia() {
+			Intent intent = new Intent(GameActivity.this, MainActivity.class);
+			startActivity(intent);
+			Globals.cliente.FecharConexao(2);
 		}
 
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {

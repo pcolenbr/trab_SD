@@ -23,7 +23,8 @@ const (
 	ARVORE_M     = "30"
 	PLANTADOR    = "1"
 	LENHADOR     = "2"
-	MAXJOGADORES = 3
+	MAXJOGADORES = 0
+	MINJOGADORES = 2
 )
 
 var (
@@ -369,7 +370,7 @@ func main() {
 	defer l.Close()
 	
 	fmt.Println("Escutando o servidor " + CONN_HOST + ":" + CONN_PORT)
-	sem := make(chan bool, MAXJOGADORES)
+	//sem := make(chan bool, MAXJOGADORES)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -377,9 +378,9 @@ func main() {
 			os.Exit(1)
 		} else {
 			log.Printf("Nova conexao estabelecida")
-			sem <- true
+		//	sem <- true
 			go func(net.Conn) {
-				defer func() { <-sem }()
+			//	defer func() { <-sem }()
 				go HandleRequest(conn)
 			}(conn)
 		}
@@ -408,23 +409,34 @@ func HandleRequest(conn net.Conn) {
 			fmt.Println(cmd[0])
 
 			if strings.EqualFold(cmd[0], string("iniciarJogador")) {
-
-				tipo := cmd[1]
+				
+				if (len(_listadejogadores.jogadores) >= MAXJOGADORES) {
+					
+					fmt.Println("Sala Cheia")
+					
+					salaCheia := "{'salaCheia' : true}";
+					b := []byte(salaCheia)
+		
+					conn.Write(b);
+					
+				} else {
+					tipo := cmd[1]
 			
-				fmt.Println("Inserir jogador")
-				id := InserirJogador(tipo, conn)
-				tab := RetornarTabuleiro()
-				
-				startGame := "{'startGame' : false}";
-				
-				if (len(_listadejogadores.jogadores) > 1) {
-					startGame = "{'startGame' : true}";
+					fmt.Println("Inserir jogador")
+					id := InserirJogador(tipo, conn)
+					tab := RetornarTabuleiro()
+					
+					startGame := "{'startGame' : false}";
+					
+					if (len(_listadejogadores.jogadores) >= MINJOGADORES) {
+						startGame = "{'startGame' : true}";
+					}
+					
+					
+					b := []byte(id + ";" + tab + ";" + startGame)
+		
+					broadcast(b)	
 				}
-				
-				
-				b := []byte(id + ";" + tab + ";" + startGame)
-	
-				broadcast(b)
 	
 			}
 		
