@@ -1,12 +1,15 @@
 package com.example.desmatapp;
 
 
+import java.util.concurrent.TimeUnit;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +25,7 @@ import com.example.desmatapp.util.Globals;
 
 public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
-		private TextView tv_pts;
+		private TextView tv_pts,tv_tempo;
 		
 		private ImageButton ib_up, ib_right, ib_down, ib_left;
 		//private int[] Globals.cliente.pos_atual;
@@ -38,7 +41,7 @@ public class GameActivity extends Activity {
 		private static final int CORTAR = 50;
 		private static final int DESTRUIR = 60;
 		// Tempos do jogo
-		private static final int ARVORE_DESIDRATADA = 5000;
+		private static final int ARVORE_DESIDRATADA = 10000;
 		private long t_ini, t_fim;
 		private boolean req,start_game;
 		
@@ -66,6 +69,8 @@ public class GameActivity extends Activity {
 		private void SetComponents() {
 			Globals.cliente.setContext(GameActivity.this);
 			tv_pts = (TextView) findViewById(R.id.tv_pts);
+			tv_tempo = (TextView) findViewById(R.id.tv_tempo);
+			
 			bt_sair = (Button) findViewById(R.id.bt_sair);
 			req = false;
 			bt_sair.setOnClickListener(new OnClickListener() {
@@ -251,12 +256,25 @@ public class GameActivity extends Activity {
 		
 		public void iniciarJogo(boolean startGame) {
 			if(startGame) {
-				runOnUiThread(new Runnable() {
-					
+				runOnUiThread(new Runnable() {					
 					@Override
 					public void run() {
 						((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
 						EnableButtons(true);
+						new CountDownTimer(60000, 1000) { // adjust the milli seconds here
+
+						    public void onTick(long millisUntilFinished) {
+						    	tv_tempo.setText(""+String.format("%d:%d", 
+						                    TimeUnit.MILLISECONDS.toMinutes( millisUntilFinished),
+						                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - 
+						                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished))));
+						    }
+
+						    public void onFinish() {
+						    	tv_tempo.setText("0:00");
+						    	//TODO exibir o vencedor
+						    }
+						 }.start();
 					}
 				});
 			}
