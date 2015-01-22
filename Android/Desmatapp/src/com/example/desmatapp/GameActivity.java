@@ -40,7 +40,7 @@ public class GameActivity extends Activity {
 		// Tempos do jogo
 		private static final int ARVORE_DESIDRATADA = 5000;
 		private long t_ini, t_fim;
-		private boolean req;
+		private boolean req,start_game;
 		
 		
 		
@@ -57,6 +57,7 @@ public class GameActivity extends Activity {
 	        }
 	        SetComponents();
 	        EnableButtons(false);
+	        start_game = false;
 			new Thread(Globals.cliente).start();
 	    }
 
@@ -94,6 +95,7 @@ public class GameActivity extends Activity {
 					public void onClick(View v) {
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.Cerca( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );								
 					}
 				});
@@ -104,6 +106,7 @@ public class GameActivity extends Activity {
 						final String pos = Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1];
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.Plantar( pos );
 						Handler handler = new Handler();
 						handler.postDelayed(new Runnable() {
@@ -130,6 +133,7 @@ public class GameActivity extends Activity {
 					public void onClick(View v) {
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.Cortar( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 					}
 				});
@@ -143,6 +147,7 @@ public class GameActivity extends Activity {
 						    public void run() {
 								t_ini = System.currentTimeMillis();
 								req = true;
+								EnableButtons(false);
 						    	Globals.cliente.Destruir( Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1] );
 						    }
 						}, 1000);						
@@ -177,6 +182,7 @@ public class GameActivity extends Activity {
 					if(Globals.cliente.pos_atual[0]>=1){
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0] + "," + Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]-1 + "," + Globals.cliente.pos_atual[1]);
 					}
 					
@@ -189,6 +195,7 @@ public class GameActivity extends Activity {
 					if(Globals.cliente.pos_atual[1]<=3){
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]+1));
 					}
 				}
@@ -200,6 +207,7 @@ public class GameActivity extends Activity {
 					if(Globals.cliente.pos_atual[0]<=3){
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], (Globals.cliente.pos_atual[0]+1)+","+Globals.cliente.pos_atual[1]);
 					}
 				}
@@ -211,6 +219,7 @@ public class GameActivity extends Activity {
 					if(Globals.cliente.pos_atual[1]>=1){
 						t_ini = System.currentTimeMillis();
 						req = true;
+						EnableButtons(false);
 						Globals.cliente.MoverJogador(Globals.cliente.pos_atual[0]+","+Globals.cliente.pos_atual[1], Globals.cliente.pos_atual[0]+","+(Globals.cliente.pos_atual[1]-1));
 					}
 					
@@ -242,8 +251,16 @@ public class GameActivity extends Activity {
 		
 		public void iniciarJogo(boolean startGame) {
 			if(startGame) {
-				((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
+						EnableButtons(true);
+					}
+				});
 			}
+			start_game = startGame;
 		}
 		
 		public void salaCheia() {
@@ -257,12 +274,13 @@ public class GameActivity extends Activity {
 				
 				@Override
 				public void run() {
-					//((RelativeLayout)findViewById(R.id.rl_loading)).setVisibility(View.INVISIBLE);
-					EnableButtons(true);
 					if(req){
 						t_fim = System.currentTimeMillis();
 						Toast.makeText(GameActivity.this, "Tempo de resposta: "+ (t_fim - t_ini) + "ms", Toast.LENGTH_SHORT).show();
 						req = false;
+					}
+					if(start_game){
+						EnableButtons(start_game);
 					}
 					int count = 0;					
 					int obj = 0;

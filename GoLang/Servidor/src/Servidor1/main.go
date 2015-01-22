@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "192.168.0.140"
+	CONN_HOST    = "192.168.56.101"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -23,7 +23,7 @@ const (
 	ARVORE_M     = "30"
 	PLANTADOR    = "1"
 	LENHADOR     = "2"
-	MAXJOGADORES = 0
+	MAXJOGADORES = 3
 	MINJOGADORES = 2
 )
 
@@ -290,12 +290,16 @@ func Cerca (id string, pos string) bool {
 	pos = strings.TrimSpace(pos)
 	posicao := strings.Split(pos, ",")
 	
-
-	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
-		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = CERCA
-		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
-
-		return true
+	obj := _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])]
+	
+	if(obj != nil){
+		if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
+			_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = CERCA
+			_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
+	
+			return true
+		}
+		return false
 	}
 
 	return false
@@ -433,7 +437,7 @@ func HandleRequest(conn net.Conn) {
 					}
 					
 					
-					b := []byte(id + ";" + tab + ";" + startGame)
+					b := []byte(id + ";" + startGame + ";" + tab)
 		
 					broadcast(b)	
 				}

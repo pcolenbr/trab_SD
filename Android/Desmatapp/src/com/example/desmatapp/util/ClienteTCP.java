@@ -87,9 +87,10 @@ public class ClienteTCP implements Runnable {
 										this.id = job.getInt("id");
 									}
 								}  else if ( job.has("objetos") ) {
-									
-									JSONArray ja = job.getJSONArray("objetos");
-									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
+									if(startGame){
+										JSONArray ja = job.getJSONArray("objetos");
+										((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
+									}
 									
 								}  else if ( job.has("startGame") ) {
 									this.startGame = job.getBoolean("startGame");
