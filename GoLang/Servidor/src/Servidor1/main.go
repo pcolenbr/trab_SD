@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	CONN_HOST    = "172.16.253.88"
+	CONN_HOST    = "192.168.0.140"
 	CONN_PORT    = "3333"
 	CONN_TYPE    = "tcp"
 	VAZIO        = "0"
@@ -23,7 +23,8 @@ const (
 	ARVORE_M     = "30"
 	PLANTADOR    = "1"
 	LENHADOR     = "2"
-	MAXJOGADORES = 3
+	MAXJOGADORES = 0
+	MINJOGADORES = 2
 )
 
 var (
@@ -369,7 +370,7 @@ func main() {
 	defer l.Close()
 	
 	fmt.Println("Escutando o servidor " + CONN_HOST + ":" + CONN_PORT)
-	sem := make(chan bool, MAXJOGADORES)
+	//sem := make(chan bool, MAXJOGADORES)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -377,9 +378,9 @@ func main() {
 			os.Exit(1)
 		} else {
 			log.Printf("Nova conexao estabelecida")
-			sem <- true
+		//	sem <- true
 			go func(net.Conn) {
-				defer func() { <-sem }()
+			//	defer func() { <-sem }()
 				go HandleRequest(conn)
 			}(conn)
 		}
@@ -408,122 +409,38 @@ func HandleRequest(conn net.Conn) {
 			fmt.Println(cmd[0])
 
 			if strings.EqualFold(cmd[0], string("iniciarJogador")) {
-
-				tipo := cmd[1]
+				
+				if (len(_listadejogadores.jogadores) >= MAXJOGADORES) {
+					
+					fmt.Println("Sala Cheia")
+					
+					salaCheia := "{'salaCheia' : true}";
+					b := []byte(salaCheia)
+		
+					conn.Write(b);
+					
+				} else {
+					tipo := cmd[1]
 			
-				fmt.Println("Inserir jogador")
-				id := InserirJogador(tipo, conn)
-				tab := RetornarTabuleiro()
-				
-				b := []byte(id + ";" +tab)
-	
-				broadcast(b)
+					fmt.Println("Inserir jogador")
+					id := InserirJogador(tipo, conn)
+					tab := RetornarTabuleiro()
+					
+					startGame := "{'startGame' : false}";
+					
+					if (len(_listadejogadores.jogadores) >= MINJOGADORES) {
+						startGame = "{'startGame' : true}";
+					}
+					
+					
+					b := []byte(id + ";" + tab + ";" + startGame)
+		
+					broadcast(b)	
+				}
 	
 			}
 		
-			if strings.EqualFold(cmd[0], string("moverJogador")) {
-	
-				id := cmd[1]
-				posAtual := cmd[2]
-				posDesejada := strings.TrimSpace(cmd[3])
-				
-	
-				fmt.Println("Mover jogador")
-				MoverJogador(id, posAtual, posDesejada)
-				tab := RetornarTabuleiro()
-	
-				b :=[]byte(tab)
-	
-				
-				broadcast(b)
-	
-			} else if strings.EqualFold(cmd[0], string("plantar")) {
-	
-				id := cmd[1]
-				pos := cmd[2]
-	
-				fmt.Println("Plantar")
-				if(Plantar(id, pos)){
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-		
-					broadcast(b)
-				}
-	
-			} else if strings.EqualFold(cmd[0], string("cortar")) {
-	
-				id := cmd[1]
-				pos := cmd[2]
-	
-				fmt.Println("Cortar")
-				if(Cortar(id, pos)){
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-		
-					broadcast(b)
-				}
-	
-			} else if strings.EqualFold(cmd[0], string("cerca")) {
-	
-				id := cmd[1]
-				pos := cmd[2]
-	
-				fmt.Println("Cerca")
-				if(Cerca(id, pos)){
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-		
-					broadcast(b)
-				}
-	
-			} else if strings.EqualFold(cmd[0], string("destruir")) {
-	
-				id := cmd[1]
-				pos := cmd[2]
-	
-				fmt.Println("Destruir")
-				destruir := Destruir( id, pos )
-				tab := RetornarTabuleiro()
-				b := []byte( destruir + ";" + tab )
-	
-				broadcast(b)
-	
-			} else if strings.EqualFold(cmd[0], string("morrendo")) {
-				
-				fmt.Println("CMD: Morrendo")
-	
-				id := cmd[1]
-				fmt.Println("CMD: ID Morrendo")
-				pos := cmd[2]
-				fmt.Println("CMD: POS Morrendo")
-	
-				fmt.Println("Morrendo")
-				Morrendo( id, pos )
-				tab := RetornarTabuleiro()
-				b := []byte( tab )
-	
-				broadcast(b)
-	
-			} else if strings.EqualFold(cmd[0], string("sair")) {
-				
-				fmt.Println("Sair")
-				id := strings.TrimSpace(cmd[1])
-				if(removerJogador(id)){
-					tab := RetornarTabuleiro()
-					b :=[]byte(tab)	
-					broadcast(b)
-				}
-	
-			} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
-				
-				fmt.Println("Pedido de Tabuleiro")
-				id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
-				if err == nil {
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-					_listadejogadores.jogadores[id].conexao.Write(b)
-				}
-			}
+			whatToDo(cmd);
 		}
 
 		reader := bufio.NewReader(conn)
@@ -534,103 +451,108 @@ func HandleRequest(conn net.Conn) {
 		// Close the connection when you're done with it.
 		cmd := strings.Split(msg, ":")
 	
-		if strings.EqualFold(cmd[0], string("moverJogador")) {
+		whatToDo(cmd);
+	}
+}
+
+func whatToDo(cmd []string) {
+		
+	if strings.EqualFold(cmd[0], string("moverJogador")) {
 	
-			id := cmd[1]
-			posAtual := cmd[2]
-			posDesejada := strings.TrimSpace(cmd[3])
+		id := cmd[1]
+		posAtual := cmd[2]
+		posDesejada := strings.TrimSpace(cmd[3])
 				
 	
-			fmt.Println("Mover jogador")
-			MoverJogador(id, posAtual, posDesejada)
-			tab := RetornarTabuleiro()
+		fmt.Println("Mover jogador")
+		MoverJogador(id, posAtual, posDesejada)
+		tab := RetornarTabuleiro()
 	
-			b :=[]byte(tab)
+		b :=[]byte(tab)
 				
-			broadcast(b)
+		broadcast(b)
 	
-		} else if strings.EqualFold(cmd[0], string("plantar")) {
+	} else if strings.EqualFold(cmd[0], string("plantar")) {
 	
-			id := cmd[1]
-			pos := cmd[2]
-	
-			fmt.Println("Plantar")
-			if(Plantar(id, pos)){
-				tab := RetornarTabuleiro()
-				b := []byte(tab)
-	
-				broadcast(b)
-			}
-	
-		} else if strings.EqualFold(cmd[0], string("cortar")) {
-	
-			id := cmd[1]
-			pos := cmd[2]
+		id := cmd[1]
+		pos := cmd[2]
 
-			if(Cortar(id, pos)){
-				tab := RetornarTabuleiro()
-				b := []byte(tab)
-	
-				broadcast(b)
-			}
-	
-		} else if strings.EqualFold(cmd[0], string("cerca")) {
-	
-			id := cmd[1]
-			pos := cmd[2]
-
-			if(Cerca(id, pos)){
-				tab := RetornarTabuleiro()
-				b := []byte(tab)
-	
-				broadcast(b)
-			}
-
-		} else if strings.EqualFold(cmd[0], string("destruir")) {
-	
-			id := cmd[1]
-			pos := cmd[2]
-
-			destruir := Destruir( id, pos )
+		fmt.Println("Plantar")
+		if(Plantar(id, pos)){
 			tab := RetornarTabuleiro()
-			b := []byte( destruir + ";" + tab )
-
-			broadcast(b)
+			b := []byte(tab)
 	
-		} else if strings.EqualFold(cmd[0], string("morrendo")) {
+			broadcast(b)
+		}
+	
+	} else if strings.EqualFold(cmd[0], string("cortar")) {
+	
+		id := cmd[1]
+		pos := cmd[2]
+
+		if(Cortar(id, pos)){
+			tab := RetornarTabuleiro()
+			b := []byte(tab)
+	
+			broadcast(b)
+		}
+	
+	} else if strings.EqualFold(cmd[0], string("cerca")) {
+	
+		id := cmd[1]
+		pos := cmd[2]
+
+		if(Cerca(id, pos)){
+			tab := RetornarTabuleiro()
+			b := []byte(tab)
+	
+			broadcast(b)
+		}
+
+	} else if strings.EqualFold(cmd[0], string("destruir")) {
+	
+		id := cmd[1]
+		pos := cmd[2]
+
+		destruir := Destruir( id, pos )
+		tab := RetornarTabuleiro()
+		b := []byte( destruir + ";" + tab )
+
+		broadcast(b)
+	
+	} else if strings.EqualFold(cmd[0], string("morrendo")) {
 			
-			fmt.Println("CMD: Morrendo")
+		fmt.Println("CMD: Morrendo")
 
-			id := cmd[1]
-			fmt.Println("CMD: ID Morrendo")
-			pos := cmd[2]
-			fmt.Println("CMD: POS Morrendo")
+		id := cmd[1]
+		fmt.Println("CMD: ID Morrendo")
+		pos := cmd[2]
+		fmt.Println("CMD: POS Morrendo")
 
-			fmt.Println("Morrendo")
-			Morrendo( id, pos )
+		fmt.Println("Morrendo")
+		Morrendo( id, pos )
+		tab := RetornarTabuleiro()
+		b := []byte( tab )
+
+		broadcast(b)
+
+	} else if strings.EqualFold(cmd[0], string("sair")) {
+		
+		fmt.Println("Sair")
+		id := strings.TrimSpace(cmd[1])
+		if(removerJogador(id)){
 			tab := RetornarTabuleiro()
-			b := []byte( tab )
-
+			b :=[]byte(tab)	
 			broadcast(b)
-
-		} else if strings.EqualFold(cmd[0], string("sair")) {
-			
-			fmt.Println("Sair")
-			id := strings.TrimSpace(cmd[1])
-			if(removerJogador(id)){
-				tab := RetornarTabuleiro()
-				b :=[]byte(tab)	
-				broadcast(b)
-			}
-		} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
-				
-				fmt.Println("Pedido de Tabuleiro")
-				id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
-				if err == nil {
-					tab := RetornarTabuleiro()
-					b := []byte(tab)
-					_listadejogadores.jogadores[id].conexao.Write(b)
-				}
-			}
+		}
+	} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
+		
+		fmt.Println("Pedido de Tabuleiro")
+		id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
+		if err == nil {
+			tab := RetornarTabuleiro()
+			b := []byte(tab)
+			_listadejogadores.jogadores[id].conexao.Write(b)
+		}
 	}
 }

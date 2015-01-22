@@ -28,6 +28,8 @@ public class ClienteTCP implements Runnable {
 	public int[] pos_atual;
 	public int id;
 	public ImageView[][] tabuleiro;
+	
+	public boolean startGame;
 
 	public ClienteTCP(String ip, int porta, int tipo) {
 
@@ -37,6 +39,8 @@ public class ClienteTCP implements Runnable {
 		this.tipo = tipo;
 		this.tabuleiro = new ImageView[5][5];
 		this.pos_atual = new int[2];
+		this.startGame = false;
+		
 	}
 	
 	public void setContext(Context context){
@@ -80,14 +84,22 @@ public class ClienteTCP implements Runnable {
 								
 								if ( job.has("id") ) {
 									if(this.id == 0) {
-										this.id =job.getInt("id");
+										this.id = job.getInt("id");
 									}
 								}  else if ( job.has("objetos") ) {
 									
 									JSONArray ja = job.getJSONArray("objetos");
 									((GameActivity) ((Activity)context)).desenharTabuleiro(ja);
 									
-								} 
+								}  else if ( job.has("startGame") ) {
+									this.startGame = job.getBoolean("startGame");
+									((GameActivity) ((Activity)context)).iniciarJogo(this.startGame);;
+								} else if ( job.has("salaCheia") ) {
+									if (job.getBoolean("salaCheia")) {
+										((GameActivity) ((Activity)context)).salaCheia();
+									}
+								}
+								
 							}						
 						}
 					
@@ -192,27 +204,48 @@ public class ClienteTCP implements Runnable {
 		}
 	}
 	
-	public void FecharConexao(){
-		try {
-			DataOutputStream os = new DataOutputStream(sock.getOutputStream());
-			os.writeBytes("sair:" + id + "\n");
-			os.flush();
-			
-			sock.setKeepAlive(false);
-			sock.close();
-			
-			if ( sock.isClosed() ) {
-				((Activity) context).runOnUiThread(new Runnable() {
-					
-					@Override
-					public void run() {
-						Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
-					}
-				});
+	public void FecharConexao(int op){
+		if(op == 1) {
+			try {
+				DataOutputStream os = new DataOutputStream(sock.getOutputStream());
+				os.writeBytes("sair:" + id + "\n");
+				os.flush();
+				
+				sock.setKeepAlive(false);
+				sock.close();
+				
+				if ( sock.isClosed() ) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(context, "Conexão com o servidor encerrada", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else if (op == 2) {
+			try {
+				sock.setKeepAlive(false);
+				sock.close();
+				
+				if ( sock.isClosed() ) {
+					((Activity) context).runOnUiThread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Toast.makeText(context, "Sala Cheia", Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+		
+		
 	}
 
 		
