@@ -261,9 +261,9 @@
         tools:ignore="UselessParent" >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="14dp"
+            android:gravity="center_horizontal"
             android:orientation="horizontal" >
 
             <Button
@@ -306,6 +306,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
             android:orientation="horizontal" >
 
             <Button
@@ -334,6 +335,13 @@
                 android:layout_height="60dp"
                 android:contentDescription="@string/right"
                 android:src="@drawable/right" />
+
+            <ImageButton
+                android:id="@+id/ib_refresh"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_action_refresh" />
+
         </LinearLayout>
 
     </LinearLayout>

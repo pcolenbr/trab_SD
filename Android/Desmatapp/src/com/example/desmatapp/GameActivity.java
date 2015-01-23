@@ -7,6 +7,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -27,7 +30,7 @@ public class GameActivity extends Activity {
 		private Button bt_act1, bt_act2,bt_act3, bt_sair;
 		private TextView tv_pts,tv_tempo;
 		
-		private ImageButton ib_up, ib_right, ib_down, ib_left;
+		private ImageButton ib_up, ib_right, ib_down, ib_left,ib_refresh;
 		//private int[] Globals.cliente.pos_atual;
 		private int tipo,pontuacao;
 		// Tipos de jogadores
@@ -79,7 +82,15 @@ public class GameActivity extends Activity {
 					Globals.cliente.FecharConexao(1);
 					finish();
 				}
-			});			
+			});		
+			ib_refresh = (ImageButton) findViewById(R.id.ib_refresh);
+			ib_refresh.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Globals.cliente.PedirTabuleiro();					
+				}
+			});
 			//-------- Início Ações por jogador: -----------//
 			bt_act1 = (Button) findViewById(R.id.bt_act1);
 			bt_act2 = (Button) findViewById(R.id.bt_act2);
@@ -272,7 +283,7 @@ public class GameActivity extends Activity {
 
 						    public void onFinish() {
 						    	tv_tempo.setText("0:00");
-						    	//TODO exibir o vencedor
+						    	Globals.cliente.FimdoTempo();
 						    }
 						 }.start();
 					}
@@ -302,6 +313,39 @@ public class GameActivity extends Activity {
 			Intent intent = new Intent(GameActivity.this, MainActivity.class);
 			startActivity(intent);
 			Globals.cliente.FecharConexao(2);
+		}
+		
+		public void vencedores(final JSONArray jogadores) throws JSONException{
+			String ordem = "";
+			for (int i=0;i<jogadores.length();i++){
+				if(jogadores.getJSONObject(i).getInt("id") == Globals.cliente.id){
+					ordem += "Voce : ";
+					
+				}
+				else{
+					ordem += jogadores.getJSONObject(i).getString("id")+" : ";
+				}
+				ordem += jogadores.getJSONObject(i).getString("pontuacao")+"\n";
+			}
+			final String msg = ordem;
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Builder alert = new AlertDialog.Builder(GameActivity.this);
+					alert.setTitle("Resultado");			
+					alert.setMessage(msg);
+					alert.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							bt_sair.callOnClick();
+							
+						}
+					});
+					alert.show();				
+				}
+			}); 
 		}
 
 		public void desenharTabuleiro(final JSONArray dados) throws JSONException {

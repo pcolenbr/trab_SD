@@ -38,6 +38,7 @@ type Jogador struct {
 	tipo       string
 	pos_linha  string
 	pos_coluna string
+	pontuacao  int
 	conexao    net.Conn
 }
 
@@ -47,6 +48,7 @@ func NovoJogador(ident int, tip string, p1 string, p2 string, conn net.Conn) *Jo
 		tipo:       tip,
 		pos_linha:  p1,
 		pos_coluna: p2,
+		pontuacao: 0,
 		conexao:    conn,
 	}
 	return jogador
@@ -149,6 +151,8 @@ func broadcast(dados []byte) {
 		if err != nil {
 			//TODO Finalizar e remover a conexao/jogador da lista e do tabuleiro
 			fmt.Println("Erro:", err.Error())
+		}else{
+			fmt.Println("Enviou Mensagem")
 		}
 	}
 	
@@ -249,6 +253,10 @@ func Plantar(id string, pos string) bool {
 	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = ARVORE
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
+		ident,err := strconv.Atoi(id)
+		if err == nil{
+			_listadejogadores.jogadores[ident].pontuacao = _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao
+		}
 		return true
 	}
 
@@ -272,14 +280,20 @@ func Cortar (id string, pos string) bool {
 	strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M)) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
-
+		ident,err := strconv.Atoi(id)
+		if err == nil{
+			_listadejogadores.jogadores[ident].pontuacao = _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao
+		}
 		return true
 	} else if strings.EqualFold(_listadejogadores.jogadores[ident].tipo, PLANTADOR) && 
 		   strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, ARVORE_M) {
 				_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
 				_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao -= 5
-
-		return true
+				ident,err = strconv.Atoi(id)
+				if err == nil{
+					_listadejogadores.jogadores[ident].pontuacao = _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao
+				}
+				return true
 	}
 
 	return false
@@ -296,7 +310,10 @@ func Cerca (id string, pos string) bool {
 		if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, VAZIO) {
 			_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = CERCA
 			_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 5
-	
+			ident,err := strconv.Atoi(id)
+			if err == nil{
+				_listadejogadores.jogadores[ident].pontuacao = _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao
+			}
 			return true
 		}
 		return false
@@ -315,6 +332,10 @@ func Destruir (id string, pos string) string {
 	if strings.EqualFold(_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj, CERCA) {
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].tipo_obj = VAZIO
 		_tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao += 10
+		ident,err := strconv.Atoi(id)
+		if err == nil{
+			_listadejogadores.jogadores[ident].pontuacao = _tabuleiro.objetos[string(posicao[0]) + "," + string(posicao[1])].pontuacao
+		}
 		return "{\"destruido\": \"true\"}"
 	}
 
@@ -340,6 +361,44 @@ func Morrendo (id string, pos string) string {
 
 	return "{\"morrendo\": \"false\"}"
 
+}
+
+func Vencedores() string{
+	tam := len(_listadejogadores.jogadores)
+	fmt.Println(tam)
+	if(tam == 3){
+		if(_listadejogadores.jogadores[1].pontuacao<_listadejogadores.jogadores[2].pontuacao){
+			_listadejogadores.jogadores[1],_listadejogadores.jogadores[2] = _listadejogadores.jogadores[2],_listadejogadores.jogadores[1]
+		}
+		if(_listadejogadores.jogadores[2].pontuacao<_listadejogadores.jogadores[3].pontuacao){
+			_listadejogadores.jogadores[2],_listadejogadores.jogadores[3]= _listadejogadores.jogadores[3],_listadejogadores.jogadores[2]
+		}
+		if(_listadejogadores.jogadores[1].pontuacao<_listadejogadores.jogadores[2].pontuacao){
+			_listadejogadores.jogadores[1],_listadejogadores.jogadores[2] = _listadejogadores.jogadores[2],_listadejogadores.jogadores[1]
+		}
+	}else if(tam == 2){
+		if(_listadejogadores.jogadores[1].pontuacao<_listadejogadores.jogadores[2].pontuacao){
+			_listadejogadores.jogadores[1],_listadejogadores.jogadores[2] = _listadejogadores.jogadores[2],_listadejogadores.jogadores[1]
+		}
+	}
+	retorno := "{\"jogadores\" : ["
+
+	for i:=1;i<=tam;i++{
+		retorno += "{"
+		
+		retorno += "\"id\" : " + strconv.Itoa(_listadejogadores.jogadores[i].id) + ","
+		retorno += "\"pontuacao\" : " + strconv.Itoa(_listadejogadores.jogadores[i].pontuacao)
+	
+		if i == tam {
+			retorno += "}"
+		} else {
+			retorno += "},"
+		}
+	}
+
+	retorno += "]}"
+	
+	return retorno
 }
 
 func removerJogador(id string) bool {
@@ -541,24 +600,32 @@ func whatToDo(cmd []string) {
 	} else if strings.EqualFold(cmd[0], string("sair")) {
 		
 		fmt.Println("Sair")
-		id := strings.TrimSpace(cmd[1])
-		if(removerJogador(id)){
-			tab := RetornarTabuleiro()
-			semJogador := "{'semJogador' : false}"
-			if (len(_listadejogadores.jogadores) >= MINJOGADORES) {
-				semJogador = "{'semJogador' : true}"
+		if len(_listadejogadores.jogadores)>0{
+			id := strings.TrimSpace(cmd[1])
+			if(removerJogador(id)){
+				tab := RetornarTabuleiro()
+				semJogador := "{'semJogador' : false}"
+				if (len(_listadejogadores.jogadores) < MINJOGADORES) {
+					semJogador = "{'semJogador' : true}"
+				}
+				b := []byte(semJogador + ";" + tab)
+				broadcast(b)
 			}
-			b := []byte(semJogador + ";" + tab)
-			broadcast(b)
 		}
 	} else if strings.EqualFold(cmd[0], string("tabuleiro")) {
 		
 		fmt.Println("Pedido de Tabuleiro")
-		id,err := strconv.Atoi(strings.TrimSpace(cmd[1]))
-		if err == nil {
-			tab := RetornarTabuleiro()
-			b := []byte(tab)
-			_listadejogadores.jogadores[id].conexao.Write(b)
-		}
+		tab := RetornarTabuleiro()
+		b := []byte(tab)
+		broadcast(b)
+	}else if strings.EqualFold(cmd[0], string("fim_tempo")) {
+		
+		fmt.Println("Acabou o tempo.")
+		lista_jog := Vencedores()
+		b := []byte(lista_jog)
+		broadcast(b)
+		_tabuleiro = NovoTabuleiro()
+		_listadejogadores = NovaListaJogadores()
+		
 	}
 }

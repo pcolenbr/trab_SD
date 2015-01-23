@@ -104,6 +104,9 @@ public class ClienteTCP implements Runnable {
 									if (job.getBoolean("salaCheia")) {
 										((GameActivity) ((Activity)context)).salaCheia();
 									}
+								} else if ( job.has("jogadores") ) {
+									JSONArray ja = job.getJSONArray("jogadores");
+									((GameActivity) ((Activity)context)).vencedores(ja);								
 								}
 								
 							}						
@@ -120,6 +123,19 @@ public class ClienteTCP implements Runnable {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public void FimdoTempo(){
+		DataOutputStream os;
+		try {
+			os = new DataOutputStream(sock.getOutputStream());
+			os.flush();
+			os.writeBytes("fim_tempo:" + id + "\n");
+			os.flush();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
